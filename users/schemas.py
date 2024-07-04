@@ -1,3 +1,4 @@
+from fastapi_users import schemas
 from pydantic import (
     BaseModel,
     EmailStr,
@@ -10,5 +11,17 @@ class UserSchema(BaseModel):
     email: EmailStr
     username: str
     phone_number: str
-    password: str
+    hashed_password: str
     registered_at: str
+
+
+class UserRead(schemas.BaseUser[int]):
+    username: str
+    registered_at: str
+
+
+
+class UserCreate(schemas.BaseUserCreate):
+    username: str
+    phone_number: str
+

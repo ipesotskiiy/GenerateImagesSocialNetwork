@@ -14,7 +14,7 @@ from settings import (
     DB_USER,
     DB_PASSWORD,
 )
-from users.models import Base
+from auth.database import Base
 
 target_metadata = Base.metadata
 

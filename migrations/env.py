@@ -14,9 +14,10 @@ from settings import (
     DB_USER,
     DB_PASSWORD,
 )
-from auth.database import Base
+from auth.models import metadata as metadata_auth
+from posts.models import metadata as metadata_posts
 
-target_metadata = Base.metadata
+target_metadata = [metadata_auth, metadata_posts]
 
 config = context.config
 

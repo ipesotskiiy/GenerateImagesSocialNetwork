@@ -2,9 +2,11 @@ from fastapi import FastAPI, Depends
 from fastapi_users import FastAPIUsers
 
 from auth.auth import auth_backend
-from auth.database import User
 from auth.manager import get_user_manager
+from auth.models import User
 from auth.schemas import UserRead, UserCreate
+from posts.router import router as router_posts
+
 
 app = FastAPI(
     title="Team Social Network"
@@ -26,6 +28,8 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+
+app.include_router(router_posts)
 
 current_user = fastapi_users.current_user()
 

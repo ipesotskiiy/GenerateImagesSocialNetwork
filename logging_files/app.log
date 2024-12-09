@@ -1,0 +1,598 @@
+2024-11-29 10:34:15,741 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:34:15,741 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:45:50,199 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:45:50,199 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:51:15,697 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:51:15,697 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:51:19,257 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:51:19,257 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:54:19,394 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:54:19,394 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:57:11,970 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:57:11,970 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:57:38,605 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:57:38,605 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:59:16,238 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 10:59:16,238 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:00:20,258 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:00:20,258 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:01:03,830 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:01:03,830 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:03:13,675 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:03:13,675 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:24:36,278 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:24:36,278 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:29:36,850 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:29:36,850 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:32:17,892 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:32:17,892 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:32:17,892 - app_logger - ERROR - Exception: object async_generator can't be used in 'await' expression
+2024-11-29 11:38:25,890 - app_logger - ERROR - Exception: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: <fastapi_users.authentication.strategy.j... (expected str, got JWTStrategy)
+[SQL: SELECT "user".id, "user".email, "user".username, "user".first_name, "user".last_name, "user".phone_number, "user".registered_at, "user".hashed_password, "user".is_active, "user".is_superuser, "user".is_verified 
+FROM "user" 
+WHERE lower("user".email) = lower($1)]
+[parameters: (<fastapi_users.authentication.strategy.jwt.JWTStrategy object at 0x0000025C3F1E7490>,)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-29 11:38:25,890 - app_logger - ERROR - Exception: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: <fastapi_users.authentication.strategy.j... (expected str, got JWTStrategy)
+[SQL: SELECT "user".id, "user".email, "user".username, "user".first_name, "user".last_name, "user".phone_number, "user".registered_at, "user".hashed_password, "user".is_active, "user".is_superuser, "user".is_verified 
+FROM "user" 
+WHERE lower("user".email) = lower($1)]
+[parameters: (<fastapi_users.authentication.strategy.jwt.JWTStrategy object at 0x0000025C3F1E7490>,)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-29 11:38:25,890 - app_logger - ERROR - Exception: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: <fastapi_users.authentication.strategy.j... (expected str, got JWTStrategy)
+[SQL: SELECT "user".id, "user".email, "user".username, "user".first_name, "user".last_name, "user".phone_number, "user".registered_at, "user".hashed_password, "user".is_active, "user".is_superuser, "user".is_verified 
+FROM "user" 
+WHERE lower("user".email) = lower($1)]
+[parameters: (<fastapi_users.authentication.strategy.jwt.JWTStrategy object at 0x0000025C3F1E7490>,)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-29 11:40:04,090 - app_logger - ERROR - Exception: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: <fastapi_users.authentication.strategy.j... (expected str, got JWTStrategy)
+[SQL: SELECT "user".id, "user".email, "user".username, "user".first_name, "user".last_name, "user".phone_number, "user".registered_at, "user".hashed_password, "user".is_active, "user".is_superuser, "user".is_verified 
+FROM "user" 
+WHERE lower("user".email) = lower($1)]
+[parameters: (<fastapi_users.authentication.strategy.jwt.JWTStrategy object at 0x00000269DF994640>,)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-29 11:40:04,090 - app_logger - ERROR - Exception: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: <fastapi_users.authentication.strategy.j... (expected str, got JWTStrategy)
+[SQL: SELECT "user".id, "user".email, "user".username, "user".first_name, "user".last_name, "user".phone_number, "user".registered_at, "user".hashed_password, "user".is_active, "user".is_superuser, "user".is_verified 
+FROM "user" 
+WHERE lower("user".email) = lower($1)]
+[parameters: (<fastapi_users.authentication.strategy.jwt.JWTStrategy object at 0x00000269DF994640>,)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2024-11-29 15:08:58,755 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:08:58,755 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:22:38,403 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:22:38,403 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:22:38,403 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:24:53,397 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:24:53,397 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:25:36,545 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:25:36,545 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:26:07,879 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:26:07,879 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:26:08,996 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:26:08,996 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:26:39,702 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:26:39,702 - app_logger - ERROR - Exception: object Post can't be used in 'await' expression
+2024-11-29 15:27:19,641 - app_logger - ERROR - Exception: 'function' object has no attribute 'id'
+2024-11-29 15:27:19,641 - app_logger - ERROR - Exception: 'function' object has no attribute 'id'
+2024-11-29 15:28:20,311 - app_logger - ERROR - Exception: 'function' object has no attribute 'id'
+2024-11-29 15:28:20,311 - app_logger - ERROR - Exception: 'function' object has no attribute 'id'
+2024-11-29 15:29:37,953 - app_logger - ERROR - Exception: 'coroutine' object has no attribute 'id'
+2024-11-29 15:29:37,953 - app_logger - ERROR - Exception: 'coroutine' object has no attribute 'id'
+2024-11-29 15:31:38,882 - app_logger - ERROR - Exception: 'coroutine' object has no attribute 'id'
+2024-11-29 15:31:38,882 - app_logger - ERROR - Exception: 'coroutine' object has no attribute 'id'
+2024-11-29 15:31:41,080 - app_logger - ERROR - Exception: 'coroutine' object has no attribute 'id'
+2024-11-29 15:31:41,080 - app_logger - ERROR - Exception: 'coroutine' object has no attribute 'id'
+2024-11-29 15:33:50,960 - app_logger - INFO - Post with id 1 updated successfully.
+2024-11-29 15:33:50,960 - app_logger - INFO - Post with id 1 updated successfully.
+2024-11-29 15:59:06,248 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 15:59:06,248 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 15:59:08,824 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 15:59:08,824 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:00:08,918 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:00:08,918 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:00:08,919 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-11-29 16:00:08,919 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-11-29 16:04:31,863 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 16:04:31,863 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 16:04:31,866 - app_logger - INFO - Request body: 
+2024-11-29 16:04:31,866 - app_logger - INFO - Request body: 
+2024-11-29 16:29:05,647 - app_logger - INFO - Request: GET /openapi.json
+2024-11-29 16:29:05,647 - app_logger - INFO - Request: GET /openapi.json
+2024-11-29 16:29:05,648 - app_logger - INFO - Request body: 
+2024-11-29 16:29:05,648 - app_logger - INFO - Request body: 
+2024-11-29 16:31:19,401 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:31:19,401 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:31:19,402 - app_logger - INFO - Request body: username=Darth%20Erebus&password=sssrrulit123zZ
+2024-11-29 16:31:19,402 - app_logger - INFO - Request body: username=Darth%20Erebus&password=sssrrulit123zZ
+2024-11-29 16:31:22,101 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:31:22,101 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:31:22,101 - app_logger - INFO - Request body: username=Darth%20Erebus&password=sssrrulit123zZ
+2024-11-29 16:31:22,101 - app_logger - INFO - Request body: username=Darth%20Erebus&password=sssrrulit123zZ
+2024-11-29 16:31:47,536 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:31:47,536 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:31:47,536 - app_logger - INFO - Request body: username=Darth_Erebus&password=sssrrulit123zZ
+2024-11-29 16:31:47,536 - app_logger - INFO - Request body: username=Darth_Erebus&password=sssrrulit123zZ
+2024-11-29 16:39:27,648 - app_logger - INFO - Request: POST /auth/register
+2024-11-29 16:39:27,648 - app_logger - INFO - Request: POST /auth/register
+2024-11-29 16:39:27,649 - app_logger - INFO - Request body: {
+  "email": "test@mail2.ru",
+  "password": "qwerty",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "testuser",
+  "phone_number": "+1111111111",
+  "first_name": "test",
+  "last_name": "test"
+}
+2024-11-29 16:39:27,649 - app_logger - INFO - Request body: {
+  "email": "test@mail2.ru",
+  "password": "qwerty",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "testuser",
+  "phone_number": "+1111111111",
+  "first_name": "test",
+  "last_name": "test"
+}
+2024-11-29 16:39:52,753 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:39:52,753 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-11-29 16:39:52,754 - app_logger - INFO - Request body: username=testuser&password=qwerty
+2024-11-29 16:39:52,754 - app_logger - INFO - Request body: username=testuser&password=qwerty
+2024-11-29 16:45:59,245 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 16:45:59,245 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 16:45:59,262 - app_logger - INFO - Request body: 
+2024-11-29 16:45:59,262 - app_logger - INFO - Request body: 
+2024-11-29 19:07:07,191 - app_logger - INFO - Request: GET /openapi.json
+2024-11-29 19:07:07,191 - app_logger - INFO - Request: GET /openapi.json
+2024-11-29 19:07:07,194 - app_logger - INFO - Request body: 
+2024-11-29 19:07:07,194 - app_logger - INFO - Request body: 
+2024-11-29 19:07:10,447 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 19:07:10,447 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 19:07:10,448 - app_logger - INFO - Request body: 
+2024-11-29 19:07:10,448 - app_logger - INFO - Request body: 
+2024-11-29 19:51:19,138 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 19:51:19,138 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 19:51:19,140 - app_logger - INFO - Request body: 
+2024-11-29 19:51:19,140 - app_logger - INFO - Request body: 
+2024-11-29 22:18:58,989 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 22:18:58,989 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 22:18:58,990 - app_logger - INFO - Request body: 
+2024-11-29 22:18:58,990 - app_logger - INFO - Request body: 
+2024-11-29 22:24:38,757 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 22:24:38,757 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-29 22:24:38,759 - app_logger - INFO - Request body: 
+2024-11-29 22:24:38,759 - app_logger - INFO - Request body: 
+2024-11-30 01:16:25,306 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 01:16:25,306 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 01:16:25,310 - app_logger - INFO - Request body: 
+2024-11-30 01:16:25,310 - app_logger - INFO - Request body: 
+2024-11-30 15:54:14,242 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 15:54:14,242 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 15:54:14,250 - app_logger - INFO - Request body: 
+2024-11-30 15:54:14,250 - app_logger - INFO - Request body: 
+2024-11-30 15:58:10,388 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 15:58:10,388 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 15:58:10,416 - app_logger - INFO - Request body: 
+2024-11-30 15:58:10,416 - app_logger - INFO - Request body: 
+2024-11-30 19:48:20,276 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 19:48:20,276 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 19:48:20,291 - app_logger - INFO - Request body: 
+2024-11-30 19:48:20,291 - app_logger - INFO - Request body: 
+2024-11-30 22:42:07,886 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 22:42:07,886 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 22:42:07,935 - app_logger - INFO - Request body: 
+2024-11-30 22:42:07,935 - app_logger - INFO - Request body: 
+2024-11-30 22:48:46,755 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 22:48:46,755 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 22:48:46,773 - app_logger - INFO - Request body: 
+2024-11-30 22:48:46,773 - app_logger - INFO - Request body: 
+2024-11-30 23:47:31,098 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 23:47:31,098 - app_logger - INFO - Request: GET /favicon.ico
+2024-11-30 23:47:31,115 - app_logger - INFO - Request body: 
+2024-11-30 23:47:31,115 - app_logger - INFO - Request body: 
+2024-12-01 02:55:32,140 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 02:55:32,140 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 02:55:32,148 - app_logger - INFO - Request body: 
+2024-12-01 02:55:32,148 - app_logger - INFO - Request body: 
+2024-12-01 11:03:37,326 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 11:03:37,326 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 11:03:37,328 - app_logger - INFO - Request body: 
+2024-12-01 11:03:37,328 - app_logger - INFO - Request body: 
+2024-12-01 11:52:35,077 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 11:52:35,077 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 11:52:35,081 - app_logger - INFO - Request body: 
+2024-12-01 11:52:35,081 - app_logger - INFO - Request body: 
+2024-12-01 12:14:10,483 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 12:14:10,483 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 12:14:10,485 - app_logger - INFO - Request body: 
+2024-12-01 12:14:10,485 - app_logger - INFO - Request body: 
+2024-12-01 12:21:28,491 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 12:21:28,491 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 12:21:28,611 - app_logger - INFO - Request body: 
+2024-12-01 12:21:28,611 - app_logger - INFO - Request body: 
+2024-12-01 15:17:50,875 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 15:17:50,875 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 15:17:50,876 - app_logger - INFO - Request body: 
+2024-12-01 15:17:50,876 - app_logger - INFO - Request body: 
+2024-12-01 16:28:01,311 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 16:28:01,311 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 16:28:01,314 - app_logger - INFO - Request body: 
+2024-12-01 16:28:01,314 - app_logger - INFO - Request body: 
+2024-12-01 16:54:18,341 - app_logger - INFO - Request: GET /admin/
+2024-12-01 16:54:18,341 - app_logger - INFO - Request: GET /admin/
+2024-12-01 16:54:18,343 - app_logger - INFO - Request body: 
+2024-12-01 16:54:18,343 - app_logger - INFO - Request body: 
+2024-12-01 16:54:18,418 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 16:54:18,418 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 16:54:18,419 - app_logger - INFO - Request body: 
+2024-12-01 16:54:18,419 - app_logger - INFO - Request body: 
+2024-12-01 16:54:22,865 - app_logger - INFO - Request: GET /âùñû
+2024-12-01 16:54:22,865 - app_logger - INFO - Request: GET /âùñû
+2024-12-01 16:54:22,869 - app_logger - INFO - Request body: 
+2024-12-01 16:54:22,869 - app_logger - INFO - Request body: 
+2024-12-01 16:54:28,186 - app_logger - INFO - Request: GET /docs
+2024-12-01 16:54:28,186 - app_logger - INFO - Request: GET /docs
+2024-12-01 16:54:28,188 - app_logger - INFO - Request body: 
+2024-12-01 16:54:28,188 - app_logger - INFO - Request body: 
+2024-12-01 16:54:28,816 - app_logger - INFO - Request: GET /docs
+2024-12-01 16:54:28,816 - app_logger - INFO - Request: GET /docs
+2024-12-01 16:54:28,818 - app_logger - INFO - Request body: 
+2024-12-01 16:54:28,818 - app_logger - INFO - Request body: 
+2024-12-01 16:54:28,989 - app_logger - INFO - Request: GET /openapi.json
+2024-12-01 16:54:28,989 - app_logger - INFO - Request: GET /openapi.json
+2024-12-01 16:54:28,990 - app_logger - INFO - Request body: 
+2024-12-01 16:54:28,990 - app_logger - INFO - Request body: 
+2024-12-01 16:54:47,404 - app_logger - INFO - Request: GET /docs
+2024-12-01 16:54:47,404 - app_logger - INFO - Request: GET /docs
+2024-12-01 16:54:47,409 - app_logger - INFO - Request body: 
+2024-12-01 16:54:47,409 - app_logger - INFO - Request body: 
+2024-12-01 16:54:48,107 - app_logger - INFO - Request: GET /openapi.json
+2024-12-01 16:54:48,107 - app_logger - INFO - Request: GET /openapi.json
+2024-12-01 16:54:48,110 - app_logger - INFO - Request body: 
+2024-12-01 16:54:48,110 - app_logger - INFO - Request body: 
+2024-12-01 17:41:23,688 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:41:23,688 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:41:23,689 - app_logger - INFO - Request body: {
+    "username": "Darth Erebus",
+    "password": "sssrrulit123zZ"
+}
+2024-12-01 17:41:23,689 - app_logger - INFO - Request body: {
+    "username": "Darth Erebus",
+    "password": "sssrrulit123zZ"
+}
+2024-12-01 17:46:59,641 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:46:59,641 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:46:59,642 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 17:46:59,642 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 17:47:03,048 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:47:03,048 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:47:03,049 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 17:47:03,049 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 17:52:28,672 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:52:28,672 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 17:52:28,676 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 17:52:28,676 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 18:25:08,911 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 18:25:08,911 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 18:25:08,912 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 18:25:08,912 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 18:37:54,929 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 18:37:54,929 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-01 18:37:54,930 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 18:37:54,930 - app_logger - INFO - Request body: grant_type=&username=Darth%20Erebus&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-01 19:26:41,438 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 19:26:41,438 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 19:26:41,440 - app_logger - INFO - Request body: 
+2024-12-01 19:26:41,440 - app_logger - INFO - Request body: 
+2024-12-01 21:06:26,941 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 21:06:26,941 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 21:06:26,947 - app_logger - INFO - Request body: 
+2024-12-01 21:06:26,947 - app_logger - INFO - Request body: 
+2024-12-01 21:12:01,926 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 21:12:01,926 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-01 21:12:01,930 - app_logger - INFO - Request body: 
+2024-12-01 21:12:01,930 - app_logger - INFO - Request body: 
+2024-12-02 00:57:34,045 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-02 00:57:34,045 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-02 00:57:34,061 - app_logger - INFO - Request body: 
+2024-12-02 00:57:34,061 - app_logger - INFO - Request body: 
+2024-12-02 09:09:56,335 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-02 09:09:56,335 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-02 09:09:56,340 - app_logger - INFO - Request body: 
+2024-12-02 09:09:56,340 - app_logger - INFO - Request body: 
+2024-12-03 00:14:01,569 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 00:14:01,569 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 00:14:01,583 - app_logger - INFO - Request body: 
+2024-12-03 00:14:01,583 - app_logger - INFO - Request body: 
+2024-12-03 00:29:53,154 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 00:29:53,154 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 00:29:53,157 - app_logger - INFO - Request body: 
+2024-12-03 00:29:53,157 - app_logger - INFO - Request body: 
+2024-12-03 00:49:29,651 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 00:49:29,651 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 00:49:29,656 - app_logger - INFO - Request body: 
+2024-12-03 00:49:29,656 - app_logger - INFO - Request body: 
+2024-12-03 11:07:24,202 - app_logger - INFO - Request: GET /
+2024-12-03 11:07:24,202 - app_logger - INFO - Request: GET /
+2024-12-03 11:07:24,204 - app_logger - INFO - Request body: 
+2024-12-03 11:07:24,204 - app_logger - INFO - Request body: 
+2024-12-03 11:07:24,348 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 11:07:24,348 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-03 11:07:24,350 - app_logger - INFO - Request body: 
+2024-12-03 11:07:24,350 - app_logger - INFO - Request body: 
+2024-12-03 11:07:29,637 - app_logger - INFO - Request: GET /docs
+2024-12-03 11:07:29,637 - app_logger - INFO - Request: GET /docs
+2024-12-03 11:07:29,639 - app_logger - INFO - Request body: 
+2024-12-03 11:07:29,639 - app_logger - INFO - Request body: 
+2024-12-03 11:07:30,409 - app_logger - INFO - Request: GET /openapi.json
+2024-12-03 11:07:30,409 - app_logger - INFO - Request: GET /openapi.json
+2024-12-03 11:07:30,410 - app_logger - INFO - Request body: 
+2024-12-03 11:07:30,410 - app_logger - INFO - Request body: 
+2024-12-03 11:16:18,947 - app_logger - INFO - Request: POST /auth/register
+2024-12-03 11:16:18,947 - app_logger - INFO - Request: POST /auth/register
+2024-12-03 11:16:18,948 - app_logger - INFO - Request body: {
+  "email": "ipesotskiiy@yandex.ru",
+  "password": "sssrrulit123zZ",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "Ireal",
+  "phone_number": "+79298144303",
+  "first_name": "Èãîðü",
+  "last_name": "Ïåñîöêèé"
+}
+2024-12-03 11:16:18,948 - app_logger - INFO - Request body: {
+  "email": "ipesotskiiy@yandex.ru",
+  "password": "sssrrulit123zZ",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "Ireal",
+  "phone_number": "+79298144303",
+  "first_name": "Èãîðü",
+  "last_name": "Ïåñîöêèé"
+}
+2024-12-03 11:24:08,382 - app_logger - INFO - Request: POST /posts/create
+2024-12-03 11:24:08,382 - app_logger - INFO - Request: POST /posts/create
+2024-12-03 11:24:08,384 - app_logger - INFO - Request body: {
+  "title": "Test title post",
+  "content": "Test post",
+  "user_id": 1
+}
+2024-12-03 11:24:08,384 - app_logger - INFO - Request body: {
+  "title": "Test title post",
+  "content": "Test post",
+  "user_id": 1
+}
+2024-12-03 11:24:08,393 - app_logger - INFO - Created a new post with title 'Test title post' by user 1
+2024-12-03 11:24:08,393 - app_logger - INFO - Created a new post with title 'Test title post' by user 1
+2024-12-03 11:24:25,424 - app_logger - INFO - Request: GET /posts/
+2024-12-03 11:24:25,424 - app_logger - INFO - Request: GET /posts/
+2024-12-03 11:24:25,425 - app_logger - INFO - Request body: 
+2024-12-03 11:24:25,425 - app_logger - INFO - Request body: 
+2024-12-03 11:24:25,430 - app_logger - INFO - Retrieved post with id 1.
+2024-12-03 11:24:25,430 - app_logger - INFO - Retrieved post with id 1.
+2024-12-03 11:24:33,091 - app_logger - INFO - Request: GET /posts/all
+2024-12-03 11:24:33,091 - app_logger - INFO - Request: GET /posts/all
+2024-12-03 11:24:33,092 - app_logger - INFO - Request body: 
+2024-12-03 11:24:33,092 - app_logger - INFO - Request body: 
+2024-12-03 11:24:33,095 - app_logger - INFO - Retrieved all posts.
+2024-12-03 11:24:33,095 - app_logger - INFO - Retrieved all posts.
+2024-12-03 11:29:15,666 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 11:29:15,666 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 11:29:15,669 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 11:29:15,669 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 11:29:15,678 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'verify'
+2024-12-03 11:29:15,678 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'verify'
+2024-12-03 12:08:11,323 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 12:08:11,323 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 12:08:11,324 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 12:08:11,324 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 12:08:11,426 - app_logger - ERROR - Exception: 'UserManager' object has no attribute 'verify_password'
+2024-12-03 12:08:11,426 - app_logger - ERROR - Exception: 'UserManager' object has no attribute 'verify_password'
+2024-12-03 12:22:26,564 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 12:22:26,564 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 12:22:26,565 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 12:22:26,565 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 16:22:36,285 - app_logger - INFO - Request: GET /docs
+2024-12-03 16:22:36,285 - app_logger - INFO - Request: GET /docs
+2024-12-03 16:22:36,287 - app_logger - INFO - Request body: 
+2024-12-03 16:22:36,287 - app_logger - INFO - Request body: 
+2024-12-03 16:22:36,558 - app_logger - INFO - Request: GET /openapi.json
+2024-12-03 16:22:36,558 - app_logger - INFO - Request: GET /openapi.json
+2024-12-03 16:22:36,559 - app_logger - INFO - Request body: 
+2024-12-03 16:22:36,559 - app_logger - INFO - Request body: 
+2024-12-03 16:22:59,405 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 16:22:59,405 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-03 16:22:59,407 - app_logger - INFO - Request body: grant_type=&username=Erebud&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-03 16:22:59,407 - app_logger - INFO - Request body: grant_type=&username=Erebud&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 10:40:02,953 - app_logger - INFO - Request: GET /docs
+2024-12-09 10:40:02,953 - app_logger - INFO - Request: GET /docs
+2024-12-09 10:40:02,957 - app_logger - INFO - Request body: 
+2024-12-09 10:40:02,957 - app_logger - INFO - Request body: 
+2024-12-09 10:40:03,463 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 10:40:03,463 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 10:40:03,465 - app_logger - INFO - Request body: 
+2024-12-09 10:40:03,465 - app_logger - INFO - Request body: 
+2024-12-09 10:42:00,682 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 10:42:00,682 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 10:42:00,684 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 10:42:00,684 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 10:54:05,361 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 10:54:05,361 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 10:54:05,363 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,363 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,368 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-09 10:54:05,368 - app_logger - INFO - Request: GET /favicon.ico
+2024-12-09 10:54:05,371 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,371 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,374 - app_logger - INFO - Request: GET /docs
+2024-12-09 10:54:05,374 - app_logger - INFO - Request: GET /docs
+2024-12-09 10:54:05,375 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,375 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,379 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 10:54:05,379 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 10:54:05,384 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 10:54:05,384 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 10:54:05,568 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 10:54:05,568 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 10:54:05,571 - app_logger - INFO - Request body: 
+2024-12-09 10:54:05,571 - app_logger - INFO - Request body: 
+2024-12-09 11:06:58,763 - app_logger - INFO - Request: GET /docs
+2024-12-09 11:06:58,763 - app_logger - INFO - Request: GET /docs
+2024-12-09 11:06:58,764 - app_logger - INFO - Request body: 
+2024-12-09 11:06:58,764 - app_logger - INFO - Request body: 
+2024-12-09 11:06:58,894 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 11:06:58,894 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 11:06:58,895 - app_logger - INFO - Request body: 
+2024-12-09 11:06:58,895 - app_logger - INFO - Request body: 
+2024-12-09 11:07:14,111 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:07:14,111 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:07:14,112 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 11:07:14,112 - app_logger - INFO - Request body: grant_type=&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 11:15:01,004 - app_logger - INFO - Request: POST /auth/register
+2024-12-09 11:15:01,004 - app_logger - INFO - Request: POST /auth/register
+2024-12-09 11:15:01,008 - app_logger - INFO - Request body: {
+  "email": "testuser@mail.ru",
+  "password": "test_password",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "testuser",
+  "phone_number": "9298144305",
+  "first_name": "test",
+  "last_name": "test"
+}
+2024-12-09 11:15:01,008 - app_logger - INFO - Request body: {
+  "email": "testuser@mail.ru",
+  "password": "test_password",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "testuser",
+  "phone_number": "9298144305",
+  "first_name": "test",
+  "last_name": "test"
+}
+2024-12-09 11:15:28,154 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:15:28,154 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:15:28,155 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 11:15:28,155 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 11:22:18,287 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:22:18,287 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:22:18,289 - app_logger - INFO - Request body: grant_type=test_password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 11:22:18,289 - app_logger - INFO - Request body: grant_type=test_password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 11:23:32,734 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:23:32,734 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 11:23:32,737 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 11:23:32,737 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:13:06,313 - app_logger - INFO - Request: GET /docs
+2024-12-09 13:13:06,313 - app_logger - INFO - Request: GET /docs
+2024-12-09 13:13:06,315 - app_logger - INFO - Request body: 
+2024-12-09 13:13:06,315 - app_logger - INFO - Request body: 
+2024-12-09 13:13:06,479 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 13:13:06,479 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 13:13:06,481 - app_logger - INFO - Request body: 
+2024-12-09 13:13:06,481 - app_logger - INFO - Request body: 
+2024-12-09 13:13:52,893 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:13:52,893 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:13:52,896 - app_logger - INFO - Request body: grant_type=password&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 13:13:52,896 - app_logger - INFO - Request body: grant_type=password&username=Ireal&password=sssrrulit123zZ&scope=&client_id=&client_secret=
+2024-12-09 13:14:29,734 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:14:29,734 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:14:29,736 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:14:29,736 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:14:35,594 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:14:35,594 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:14:35,597 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=testpassword&scope=&client_id=&client_secret=
+2024-12-09 13:14:35,597 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=testpassword&scope=&client_id=&client_secret=
+2024-12-09 13:16:13,131 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:16:13,131 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:16:13,132 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=testpassword&scope=&client_id=&client_secret=
+2024-12-09 13:16:13,132 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=testpassword&scope=&client_id=&client_secret=
+2024-12-09 13:16:37,695 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:16:37,695 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:16:37,696 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:16:37,696 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:20:41,272 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:20:41,272 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:20:41,273 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:20:41,273 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:23:09,280 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:23:09,280 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:23:09,285 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:23:09,285 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:28:22,833 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:28:22,833 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:28:22,834 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:28:22,834 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:28:57,297 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:28:57,297 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:28:57,301 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:28:57,301 - app_logger - INFO - Request body: grant_type=password&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:44:29,324 - app_logger - INFO - Request: GET /docs
+2024-12-09 13:44:29,324 - app_logger - INFO - Request: GET /docs
+2024-12-09 13:44:29,326 - app_logger - INFO - Request body: 
+2024-12-09 13:44:29,326 - app_logger - INFO - Request body: 
+2024-12-09 13:44:29,647 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 13:44:29,647 - app_logger - INFO - Request: GET /openapi.json
+2024-12-09 13:44:29,652 - app_logger - INFO - Request body: 
+2024-12-09 13:44:29,652 - app_logger - INFO - Request body: 
+2024-12-09 13:44:55,212 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:44:55,212 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:44:55,213 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:44:55,213 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:44:55,335 - app_logger - ERROR - Exception: 'UserManager' object has no attribute 'verify_password'
+2024-12-09 13:44:55,335 - app_logger - ERROR - Exception: 'UserManager' object has no attribute 'verify_password'
+2024-12-09 13:51:18,009 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:51:18,009 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:51:18,010 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:51:18,010 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:51:18,137 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'verify'
+2024-12-09 13:51:18,137 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'verify'
+2024-12-09 13:57:54,484 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:57:54,484 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 13:57:54,488 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:57:54,488 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 13:57:54,597 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'context'
+2024-12-09 13:57:54,597 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'context'
+2024-12-09 14:03:19,220 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 14:03:19,220 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 14:03:19,221 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 14:03:19,221 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 14:03:19,348 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'verify'
+2024-12-09 14:03:19,348 - app_logger - ERROR - Exception: 'PasswordHelper' object has no attribute 'verify'
+2024-12-09 14:04:17,487 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 14:04:17,487 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 14:04:17,489 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 14:04:17,489 - app_logger - INFO - Request body: grant_type=&username=testuser&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 14:25:41,357 - app_logger - INFO - Request: POST /auth/register
+2024-12-09 14:25:41,357 - app_logger - INFO - Request: POST /auth/register
+2024-12-09 14:25:41,358 - app_logger - INFO - Request body: {
+  "email": "testuser2@mail.ru",
+  "password": "test_password",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "testuser2",
+  "phone_number": "9298144306",
+  "first_name": "testuser2",
+  "last_name": "testuser2"
+}
+2024-12-09 14:25:41,358 - app_logger - INFO - Request body: {
+  "email": "testuser2@mail.ru",
+  "password": "test_password",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "testuser2",
+  "phone_number": "9298144306",
+  "first_name": "testuser2",
+  "last_name": "testuser2"
+}
+2024-12-09 14:26:03,167 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 14:26:03,167 - app_logger - INFO - Request: POST /auth/jwt/login
+2024-12-09 14:26:03,169 - app_logger - INFO - Request body: grant_type=&username=testuser2&password=test_password&scope=&client_id=&client_secret=
+2024-12-09 14:26:03,169 - app_logger - INFO - Request body: grant_type=&username=testuser2&password=test_password&scope=&client_id=&client_secret=

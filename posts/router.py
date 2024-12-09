@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from auth.models import User
 from posts.models import Post
 from posts.schemas import PostCreate, PostUpdate
 from settings import get_async_session
+from dependencies import current_user
 
 router = APIRouter(
     prefix="/posts",
@@ -17,8 +19,10 @@ async def get_post(id: int, session: AsyncSession = Depends(get_async_session)):
     query = select(Post).where(Post.id == id)
     result = await session.execute(query)
     post = result.scalars().first()
+
     if not post:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail="Запись не найдена")
+
     post_dict = {
         "id": post.id,
         "title": post.title,
@@ -57,46 +61,59 @@ async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_asy
     return {"status": "Created"}
 
 
-@router.patch("/update/{id}")
-async def update_post(id: int, update_post: PostUpdate, session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).where(Post.id == id)
+@router.patch("/update/{post_id}")
+async def update_post(
+        post_id: int,
+        post_data: PostUpdate,
+        session: AsyncSession = Depends(get_async_session),
+        current_user: User = Depends(current_user)
+):
+    # Выполнение запроса
+    query = select(Post).where(Post.id == post_id)
     result = await session.execute(query)
+    # Используем .scalars() для извлечения значений, а затем first()
     existing_post = result.scalars().first()
-
     if not existing_post:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail="Запись не найдена.")
 
-    # Создаем словарь с полями, которые нужно обновить
-    update_fields = {key: value for key, value in update_post.dict().items() if value is not None}
+    if existing_post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Только автор может редактировать пост."
+        )
 
-    # Проверяем, есть ли данные для обновления
-    if not update_fields:
-        raise HTTPException(status_code=400, detail="No data provided to update")
+    # Формируем запрос на обновление
+    existing_post.title = post_data.title
+    existing_post.content = post_data.content
 
-    stmt = (
-        update(Post)
-            .where(Post.id == id)
-            .values(**update_fields)
-            .execution_options(synchronize_session="fetch")
-    )
-
-    await session.execute(stmt)
+    # Выполнение запроса на обновление и коммит транзакции
+    session.add(existing_post)
     await session.commit()
+    await session.refresh(existing_post)
 
     return {"status": "Updated"}
 
 
-@router.delete("delete/{id}")
-async def delete_post(id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).where(Post.id == id)
+@router.delete("/delete/{post_id}")
+async def delete_post(
+        post_id: int,
+        session: AsyncSession = Depends(get_async_session),
+        current_user: User = Depends(current_user)
+):
+    query = select(Post).where(Post.id == post_id)
     result = await session.execute(query)
     existing_post = result.scalars().first()
 
     if not existing_post:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail="Запись не найдена")
 
-    stmt = delete(Post).where(Post.id == id)
-    await session.execute(stmt)
+    if existing_post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Только автор может удалить пост"
+        )
+
+    await session.delete(existing_post)
     await session.commit()
 
-    return {"status": "Deleted", "id": id}
+    return {"status": "Deleted", "id": post_id}

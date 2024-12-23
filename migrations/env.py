@@ -18,6 +18,7 @@ from settings import (
 
 from posts.models import Post
 from auth.models import User
+from comments.models import Comment
 
 target_metadata = Base.metadata
 

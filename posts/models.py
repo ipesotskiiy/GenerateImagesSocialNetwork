@@ -16,7 +16,6 @@ class Post(Base):
     content = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=True)
-    # Внешний ключ для связи с User
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    # Отношение к User
     author = relationship("User", back_populates="posts")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import select, insert
+from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
@@ -10,14 +11,15 @@ from dependencies import current_user
 
 router = APIRouter(
     prefix="/posts",
-    tags=["Post"]
+    tags=["Posts 📖"]
+
 )
 
 
-@router.get('/')
-async def get_post(id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).where(Post.id == id)
-    result = await session.execute(query)
+@router.get('/{post_id}/', summary="Получить пост")
+async def get_post(post_id: int, session: AsyncSession = Depends(get_async_session)):
+    query = select(Post).where(Post.id == post_id)
+    result: Result = await session.execute(query)
     post = result.scalars().first()
 
     if not post:
@@ -33,10 +35,10 @@ async def get_post(id: int, session: AsyncSession = Depends(get_async_session)):
     return post_dict
 
 
-@router.get("/all")
+@router.get("/all/", summary="Получить все посты")
 async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
-    query = select(Post)
-    result = await session.execute(query)
+    query = select(Post).order_by(Post.id)
+    result: Result = await session.execute(query)
     posts = result.scalars().all()
 
     post_list = [
@@ -53,7 +55,7 @@ async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
     return post_list
 
 
-@router.post('/create')
+@router.post('/create/', summary="Создать пост")
 async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_async_session)):
     stmt = insert(Post).values(**new_post.dict())
     await session.execute(stmt)
@@ -61,7 +63,7 @@ async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_asy
     return {"status": "Created"}
 
 
-@router.patch("/update/{post_id}")
+@router.patch("/update/{post_id}/", summary="Обновить пост")
 async def update_post(
         post_id: int,
         post_data: PostUpdate,
@@ -70,7 +72,7 @@ async def update_post(
 ):
     # Выполнение запроса
     query = select(Post).where(Post.id == post_id)
-    result = await session.execute(query)
+    result: Result = await session.execute(query)
     # Используем .scalars() для извлечения значений, а затем first()
     existing_post = result.scalars().first()
     if not existing_post:
@@ -94,14 +96,14 @@ async def update_post(
     return {"status": "Updated"}
 
 
-@router.delete("/delete/{post_id}")
+@router.delete("/delete/{post_id}/", summary="Удалить пост 💣")
 async def delete_post(
         post_id: int,
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(current_user)
 ):
     query = select(Post).where(Post.id == post_id)
-    result = await session.execute(query)
+    result: Result = await session.execute(query)
     existing_post = result.scalars().first()
 
     if not existing_post:

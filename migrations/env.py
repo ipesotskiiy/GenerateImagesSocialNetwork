@@ -16,9 +16,10 @@ from settings import (
     Base
 )
 
-from posts.models import Post
+from posts.models import Post, post_categories
 from auth.models import User
 from comments.models import Comment
+from categories.models import Category
 
 target_metadata = Base.metadata
 

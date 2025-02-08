@@ -24,7 +24,7 @@ async def get_comment(comment_id: int, session: AsyncSession = Depends(get_async
     if not comment:
         raise HTTPException(status_code=404, detail="Коммент не найдена")
 
-    comment_dict = {
+    return {
         "id": comment.id,
         "text": comment.text,
         "created_at": comment.created_at,
@@ -33,8 +33,6 @@ async def get_comment(comment_id: int, session: AsyncSession = Depends(get_async
         "post_id": comment.post_id
     }
 
-    return comment_dict
-
 
 @router.get("/all/", summary="Взять все комментарии")
 async def get_all_comments(session: AsyncSession = Depends(get_async_session)):
@@ -42,7 +40,7 @@ async def get_all_comments(session: AsyncSession = Depends(get_async_session)):
     result: Result = await session.execute(query)
     comments = result.scalars().all()
 
-    comments_list = [
+    return [
         {
             "id": comment.id,
             "text": comment.text,
@@ -53,8 +51,6 @@ async def get_all_comments(session: AsyncSession = Depends(get_async_session)):
         }
         for comment in comments
     ]
-
-    return comments_list
 
 
 @router.post('/create/', summary="Создать комментарий")

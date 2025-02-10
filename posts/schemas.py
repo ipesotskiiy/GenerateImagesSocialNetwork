@@ -19,8 +19,8 @@ class PostRead(BaseModel):
     title: str
     content: str
     created_at: datetime.datetime
-    updated_at: datetime.datetime
-    categories: List[str]
+    updated_at: datetime.datetime = None
+    categories: List[str] = None
     user_id: int
 
     class Config:
@@ -30,3 +30,7 @@ class PostRead(BaseModel):
 class PostUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
+    categories: List[str] = None
+
+    class Config:
+        orm_mode = True

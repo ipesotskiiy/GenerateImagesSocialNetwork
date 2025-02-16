@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import datetime, date
+from typing import Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date
 from sqlalchemy.orm import relationship
 
 from settings import Base
@@ -17,7 +18,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     last_name = Column(String(30))
     phone_number = Column(String(12), nullable=False, unique=True, index=True)
     bio = Column(String(2000))
-    age = Column(Integer)
+    date_of_birth = Column(Date, nullable=True)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
@@ -26,3 +27,13 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
+
+    @property
+    def age(self) -> Optional[int]:
+        """Вычисляет возраст на основе даты рождения."""
+        if self.date_of_birth:
+            today = date.today()
+            return today.year - self.date_of_birth.year - (
+                (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
+            )
+        return None

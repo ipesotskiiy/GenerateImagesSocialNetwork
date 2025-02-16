@@ -1,11 +1,18 @@
 import datetime
 
-from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func
+from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func, Table
 from sqlalchemy.orm import relationship
 
 from settings import Base
 
 metadata = MetaData()
+
+post_categories = Table(
+    "post_categories",
+    Base.metadata,
+    Column("post_id", Integer, ForeignKey("post.id"), primary_key=True),
+    Column("category_id", Integer, ForeignKey("category.id"), primary_key=True)
+)
 
 
 class Post(Base):
@@ -19,3 +26,4 @@ class Post(Base):
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     author = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
+    categories = relationship("Category", secondary="post_categories", back_populates="posts")

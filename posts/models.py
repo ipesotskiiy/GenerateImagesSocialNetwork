@@ -1,8 +1,8 @@
 import datetime
+from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func, Table, and_
+from sqlalchemy.orm import relationship, foreign
 
-from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func, Table
-from sqlalchemy.orm import relationship
-
+from like_dislike.models import Like
 from settings import Base
 
 metadata = MetaData()
@@ -24,6 +24,20 @@ class Post(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=True)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+
+    # Связи
     author = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
     categories = relationship("Category", secondary="post_categories", back_populates="posts")
+    likes = relationship(
+        "Like",
+        primaryjoin=lambda: and_(
+            foreign(Like.content_id) == Post.id,
+            Like.content_type == "post"
+        ),
+        viewonly=True
+    )
+
+    @property
+    def likes_count(self):
+        return len(self.likes)

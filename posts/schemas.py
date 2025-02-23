@@ -1,5 +1,5 @@
+from typing import List, Optional
 import datetime
-from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -19,9 +19,10 @@ class PostRead(BaseModel):
     title: str
     content: str
     created_at: datetime.datetime
-    updated_at: datetime.datetime = None
+    updated_at: Optional[datetime.datetime] = None
     categories: List[str] = None
     user_id: int
+    likes_count: int
 
     class Config:
         orm_mode = True

@@ -6,6 +6,23 @@ class CommentCreate(BaseModel):
     user_id: int
     post_id: int
 
+    class Config:
+        orm_mode = True
+
+
+class CommentRead(BaseModel):
+    id: int
+    text: str
+    user_id: int
+    post_id: int
+    likes_count: int
+
+    class Config:
+        orm_mode = True
+
 
 class CommentUpdate(BaseModel):
     text: str
+
+    class Config:
+        orm_mode = True

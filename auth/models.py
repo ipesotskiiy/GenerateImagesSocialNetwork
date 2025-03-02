@@ -27,6 +27,8 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
+    likes = relationship("Like", back_populates="user")
+    dislikes = relationship("Dislike", back_populates="user")
 
     @property
     def age(self) -> Optional[int]:

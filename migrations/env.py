@@ -20,6 +20,7 @@ from posts.models import Post, post_categories
 from auth.models import User
 from comments.models import Comment
 from categories.models import Category
+from like_dislike.models import Like, Dislike
 
 target_metadata = Base.metadata
 

@@ -2,8 +2,7 @@ import datetime
 from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, and_
 from sqlalchemy.orm import relationship, foreign
 
-from like_dislike.models import Like
-from posts.models import Post
+from like_dislike.models import Like, Dislike
 from settings import Base
 
 
@@ -25,6 +24,14 @@ class Comment(Base):
         primaryjoin=lambda: and_(
             foreign(Like.content_id) == Comment.id,
             Like.content_type == "comment"
+        ),
+        viewonly=True
+    )
+    dislikes = relationship(
+        "Dislike",
+        primaryjoin=lambda: and_(
+            foreign(Dislike.content_id) == Comment.id,
+            Dislike.content_type == "comment"
         ),
         viewonly=True
     )

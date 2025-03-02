@@ -8,9 +8,9 @@ from dependencies import fastapi_users
 from logging_config import Logger
 from posts.router import router as router_posts
 from comments.router import router as router_comments
-from settings import get_async_session, async_session_maker
+from settings import async_session_maker
 from startup import create_seed_categories
-from like_dislike.router import router as router_like
+from like_dislike.router import like_router as router_like, dislike_router as router_dislike
 
 logger = Logger()
 
@@ -37,6 +37,7 @@ current_user = fastapi_users.current_user()
 app.include_router(router_posts)
 app.include_router(router_comments)
 app.include_router(router_like)
+app.include_router(router_dislike)
 
 
 @app.get("/protected-route")

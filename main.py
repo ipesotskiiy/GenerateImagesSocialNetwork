@@ -11,6 +11,7 @@ from comments.router import router as router_comments
 from settings import async_session_maker
 from startup import create_seed_categories
 from like_dislike.router import like_router as router_like, dislike_router as router_dislike
+from communities.router import router as router_community
 
 logger = Logger()
 
@@ -38,6 +39,7 @@ app.include_router(router_posts)
 app.include_router(router_comments)
 app.include_router(router_like)
 app.include_router(router_dislike)
+app.include_router(router_community)
 
 
 @app.get("/protected-route")

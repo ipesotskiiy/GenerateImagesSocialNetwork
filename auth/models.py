@@ -31,6 +31,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     likes = relationship("Like", back_populates="user")
     dislikes = relationship("Dislike", back_populates="user")
     communities = relationship(Community, secondary=user_community, back_populates="users")
+    created_communities = relationship("Community", back_populates="creator")
 
     @property
     def age(self) -> Optional[int]:

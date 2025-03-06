@@ -21,6 +21,7 @@ from auth.models import User
 from comments.models import Comment
 from categories.models import Category
 from like_dislike.models import Like, Dislike
+from communities.models import Community
 
 target_metadata = Base.metadata
 

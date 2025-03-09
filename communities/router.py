@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, insert
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
-from communities.models import Community
+from communities.models import Community, CommunityMembership, CommunityRoleEnum
 from communities.schemas import CreateCommunity, UpdateCommunity
 from dependencies import current_user
 from settings import get_async_session
@@ -55,10 +55,19 @@ async def create_community(
     community_data = new_community.dict()
     community_data["creator_id"] = current_user.id
 
-    stmt = insert(Community).values(**community_data)
-    await session.execute(stmt)
+    new_comm = Community(**community_data)
+    session.add(new_comm)
+    await session.flush()
+
+    membership = CommunityMembership(
+        user_id=current_user.id,
+        community_id=new_comm.id,
+        role=CommunityRoleEnum.admin
+    )
+    session.add(membership)
     await session.commit()
-    return {"status": "Created"}
+
+    return {"status": "Created", "community_id": new_comm.id}
 
 
 @router.patch("/update/{community_id}/", summary="Обновить сообщество")

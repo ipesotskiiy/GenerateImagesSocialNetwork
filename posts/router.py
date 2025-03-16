@@ -56,7 +56,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
         "content": post.content,
         "created_at": post.created_at,
         "updated_at": post.updated_at,
-        "categories": [category.name for category in post.categories],  # Здесь исправление
+        "categories": [category.name for category in post.categories],
         "user_id": post.user_id,
     }
 
@@ -68,23 +68,17 @@ async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_asy
     post_data = new_post.dict(exclude={"categories"})
     post = Post(**post_data)
 
-    # Для каждой категории ищем объект Category
     categories_objects = []
     for cat_name in new_post.categories:
-        # пробуем найти категорию с таким именем
         result = await session.execute(select(Category).filter_by(name=cat_name))
         category_obj = result.scalar_one_or_none()
 
         categories_objects.append(category_obj)
 
-    # 3. Привязываем категории к посту
-    #   (post.categories - это relationship через secondary=post_categories)
     post.categories = categories_objects
 
-    # 4. Добавляем сам пост в сессию, коммитим
     session.add(post)
     await session.commit()
-    # Обновим поля post (например, чтобы получить новый id)
     await session.refresh(post)
 
     return {"status": "Created", "id": post.id}
@@ -97,10 +91,8 @@ async def update_post(
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(current_user)
 ):
-    # Выполнение запроса
     query = select(Post).where(Post.id == post_id).options(selectinload(Post.categories))
     result: Result = await session.execute(query)
-    # Используем .scalars() для извлечения значений, а затем first()
     existing_post = result.scalars().first()
     if not existing_post:
         raise HTTPException(status_code=404, detail="Запись не найдена.")
@@ -111,16 +103,13 @@ async def update_post(
             detail="Только автор может редактировать пост."
         )
 
-    # Формируем запрос на обновление
     existing_post.title = post_data.title
     existing_post.content = post_data.content
-    # Загружаем категории из БД
     category_query = select(Category).where(Category.name.in_(post_data.categories))
     category_result = await session.execute(category_query)
     categories = category_result.scalars().all()
 
-    existing_post.categories = categories  # Присваиваем список объектов Category
-    # Выполнение запроса на обновление и коммит транзакции
+    existing_post.categories = categories
     session.add(existing_post)
     await session.commit()
     await session.refresh(existing_post)

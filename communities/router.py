@@ -252,13 +252,18 @@ async def create_post_in_community(
         user_id=current_user.id,
         community_id=community_id
     )
+    try:
+        categories_objects = []
+        for cat_name in post_data.categories:
+            result = await session.execute(select(Category).filter_by(name=cat_name))
+            category_obj = result.scalar_one_or_none()
+            categories_objects.append(category_obj)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Не найденно данной категории")
 
-    categories = []
-    for cat_name in post_data.categories:
-        category = Category(name=cat_name)
-        session.add(category)
-        categories.append(category)
-    new_post.categories = categories
+    if not categories_objects:
+        raise HTTPException(status_code=404, detail="Не найденно данной категории")
+    new_post.categories = categories_objects
 
     session.add(new_post)
     await session.commit()

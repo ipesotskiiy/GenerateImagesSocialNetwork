@@ -2,10 +2,9 @@ from datetime import datetime, date
 from typing import Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date, ForeignKey, Table
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date
 from sqlalchemy.orm import relationship
 
-from communities.models import Community, user_community
 from settings import Base
 
 
@@ -30,7 +29,11 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
     likes = relationship("Like", back_populates="user")
     dislikes = relationship("Dislike", back_populates="user")
-    communities = relationship(Community, secondary=user_community, back_populates="users")
+    community_memberships = relationship(
+        "CommunityMembership",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
     created_communities = relationship("Community", back_populates="creator")
 
     @property

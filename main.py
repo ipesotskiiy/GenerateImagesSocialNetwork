@@ -3,6 +3,7 @@ from fastapi import FastAPI, Depends
 
 from auth.auth import auth_backend
 from auth.models import User
+from auth.router import router as router_subscriptions
 from auth.schemas import UserRead, UserCreate
 from dependencies import fastapi_users
 from logging_config import Logger
@@ -40,6 +41,7 @@ app.include_router(router_comments)
 app.include_router(router_like)
 app.include_router(router_dislike)
 app.include_router(router_community)
+app.include_router(router_subscriptions)
 
 
 @app.get("/protected-route")

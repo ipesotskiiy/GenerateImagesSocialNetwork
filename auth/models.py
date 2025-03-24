@@ -2,10 +2,17 @@ from datetime import datetime, date
 from typing import Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 from settings import Base
+
+user_subscriptions = Table(
+    'user_subscriptions',
+    Base.metadata,
+    Column('follower_id', Integer, ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+    Column('following_id', Integer, ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
+)
 
 
 class User(SQLAlchemyBaseUserTable[int], Base):
@@ -35,6 +42,20 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         cascade="all, delete-orphan"
     )
     created_communities = relationship("Community", back_populates="creator")
+    followers = relationship(
+        "User",
+        secondary=user_subscriptions,
+        primaryjoin=(user_subscriptions.c.following_id == id),
+        secondaryjoin=(user_subscriptions.c.follower_id == id),
+        back_populates="following"
+    )
+    following = relationship(
+        "User",
+        secondary=user_subscriptions,
+        primaryjoin=(user_subscriptions.c.follower_id == id),
+        secondaryjoin=(user_subscriptions.c.following_id == id),
+        back_populates="followers"
+    )
 
     @property
     def age(self) -> Optional[int]:

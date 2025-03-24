@@ -2,7 +2,6 @@ from datetime import date
 from typing import Optional
 
 from fastapi_users import schemas
-from pydantic import conint, Field
 
 
 class UserRead(schemas.BaseUser[int]):

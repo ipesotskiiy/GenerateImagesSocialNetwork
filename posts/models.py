@@ -51,4 +51,8 @@ class Post(Base):
 
     @property
     def likes_count(self):
-        return len(self.likes)
+        return len(self.likes) if self.likes else 0
+
+    @property
+    def dislikes_count(self):
+        return len(self.dislikes) if self.dislikes else 0

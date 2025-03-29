@@ -84,3 +84,37 @@ async def test_login_wrong_password(async_client):
     )
     assert resp.status_code == 400, resp.text
     assert resp.json()["detail"] == "LOGIN_BAD_CREDENTIALS"
+
+
+@pytest.mark.asyncio
+async def test_toggle_follow_user(authenticated_client, db_session, second_user):
+    """
+    Проверяем подписку/отписку на другого пользователя.
+    authenticated_client - клиент, авторизованный как current_user
+    first_user - фикстура, создающая пользователя в БД, на которого будем подписываться
+    """
+
+    follow_url = f"/subscriptions/follow/{second_user.id}"
+
+    response = await authenticated_client.post(follow_url)
+    data = response.json()
+    assert response.status_code == 200
+    assert "Вы успешно подписались" in data["message"]
+
+    current_user = authenticated_client.current_user
+    await db_session.refresh(current_user, attribute_names=["following"])
+    assert second_user in current_user.following
+
+    response = await authenticated_client.post(follow_url)
+    data = response.json()
+    assert response.status_code == 200
+    assert "Вы успешно отписались" in data["message"]
+
+    await db_session.refresh(current_user, attribute_names=["following"])
+    assert second_user not in current_user.following
+
+    response = await authenticated_client.post("/subscriptions/follow/99999999")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Пользователь не найден"
+
+

@@ -43,7 +43,6 @@ async def async_client(db_session):
 
     app.dependency_overrides[get_async_session] = override_get_async_session
 
-    # Вместо app=app используем transport=ASGITransport(app=app)
     transport = ASGITransport(app=app, raise_app_exceptions=True)
 
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:
@@ -79,7 +78,7 @@ async def first_user(async_client, db_session):
 @pytest_asyncio.fixture
 async def authorize_first_user(async_client, db_session, first_user):
     login_data = {
-        "username": "test_user1",
+        "username": first_user.username,
         "password": "hard_password"
     }
 
@@ -92,12 +91,37 @@ async def authorize_first_user(async_client, db_session, first_user):
 
     access_token = login_resp.json()["access_token"]
 
-    # Обновить заголовки клиента
     async_client.headers.update({
         "Authorization": f"Bearer {access_token}"
     })
 
+    async_client.current_user = first_user
+
     return async_client
+
+
+@pytest_asyncio.fixture
+async def second_user(async_client, db_session):
+    payload = {
+        "email": "second_test_user@mail.ru",
+        "username": "second_test_user",
+        "phone_number": "89298144302",
+        "password": "hard_password",
+        "first_name": "John",
+        "last_name": "Doe",
+        "date_of_birth": "2000-01-01",
+        "bio": "Some biography text"
+    }
+    response = await async_client.post("/auth/register", json=payload)
+    assert response.status_code == 201
+
+    data = response.json()
+    user_in_db = await db_session.get(User, data["id"])
+    assert user_in_db is not None
+    yield user_in_db
+
+    await db_session.delete(user_in_db)
+    await db_session.commit()
 
 DEFAULT_CATEGORIES = {
     "Music",
@@ -199,7 +223,6 @@ async def authorized_client_with_post(async_client, db_session):
     user = result.scalar_one()
     assert user is not None
 
-    # Создаём пост от этого юзера
     post = Post(
         title="Initial title",
         content="Initial content",
@@ -211,4 +234,12 @@ async def authorized_client_with_post(async_client, db_session):
 
     return async_client, post
 
+
+@pytest_asyncio.fixture
+async def authenticated_client(authorize_first_user):
+    """
+    Фикстура возвращает клиента, авторизованного с помощью authorize_first_user.
+    Используйте её для обращения к защищённым эндпоинтам.
+    """
+    return authorize_first_user
 

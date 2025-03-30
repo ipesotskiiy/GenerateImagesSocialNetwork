@@ -28,7 +28,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('user_id', 'community_id')
     )
-    op.drop_table('user_community')
+    # op.drop_table('user_community')
     # ### end Alembic commands ###
 
 

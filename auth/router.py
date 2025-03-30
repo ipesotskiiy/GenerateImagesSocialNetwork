@@ -20,9 +20,11 @@ async def toggle_follow_user(
 ):
     await session.refresh(current_user, attribute_names=["following"])
 
+    # TODO переименовать переменную
     stmt = select(User).where(User.id == user_id)
     result = await session.execute(stmt)
     user_to_follow = result.scalars().first()
+
     if not user_to_follow:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
 
@@ -30,6 +32,7 @@ async def toggle_follow_user(
         current_user.following.remove(user_to_follow)
         await session.commit()
         return {"message": f"Вы успешно отписались от {user_to_follow.username}"}
+    # TODO убрать else
     else:
         current_user.following.append(user_to_follow)
         await session.commit()

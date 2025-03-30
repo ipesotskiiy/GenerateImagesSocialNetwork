@@ -5,6 +5,7 @@ from httpx import AsyncClient, ASGITransport
 
 from auth.models import User
 from categories.models import Category
+from comments.models import Comment
 from main import app
 from posts.models import Post
 from settings import get_async_session, Base
@@ -243,3 +244,52 @@ async def authenticated_client(authorize_first_user):
     """
     return authorize_first_user
 
+
+@pytest_asyncio.fixture
+async def first_comment(async_client, db_session, first_user, first_post):
+    payload = {
+        "text": "First test comment",
+        "user_id": first_user.id,
+        "post_id": first_post.id
+    }
+
+    response = await async_client.post("/comments/create/", json=payload)
+
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert 'id' in data
+
+    comment_in_db = await db_session.get(Comment, data["id"])
+    assert comment_in_db is not None
+
+    yield comment_in_db
+
+    await db_session.delete(comment_in_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def second_comment(async_client, db_session, first_user, first_post):
+    payload = {
+        "text": "Second test comment",
+        "user_id": first_user.id,
+        "post_id": first_post.id
+    }
+
+    response = await async_client.post("/comments/create/", json=payload)
+
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert 'id' in data
+
+    comment_in_db = await db_session.get(Comment, data["id"])
+    assert comment_in_db is not None
+
+    yield comment_in_db
+
+    await db_session.delete(comment_in_db)
+    await db_session.commit()

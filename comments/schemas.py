@@ -16,6 +16,7 @@ class CommentRead(BaseModel):
     user_id: int
     post_id: int
     likes_count: int
+    dislikes_count: int
 
     class Config:
         orm_mode = True

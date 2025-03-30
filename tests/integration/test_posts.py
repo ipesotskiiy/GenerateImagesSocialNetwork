@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 
 from posts.models import Post
 
@@ -33,9 +34,6 @@ async def test_get_all_posts(async_client, first_post, second_post):
 async def test_get_post(async_client, first_post, second_post):
     response = await async_client.get(f"/posts/{second_post.id}/")
     assert response.status_code == 200
-    print()
-    print("RESPONSE TEXT:", response.text)
-    print()
     data = response.json()
     assert data["title"] == "Test second post title"
 

@@ -28,8 +28,8 @@ async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
         selectinload(Post.dislikes)
     ).order_by(Post.id)
     result: Result = await session.execute(query)
-    posts = result.scalars().all()
-    return posts
+
+    return result.scalars().all()
 
 
 @router.get('/{post_id}/', response_model=PostRead, summary="Получить пост")
@@ -40,6 +40,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
         selectinload(Post.dislikes)
     )
     result: Result = await session.execute(query)
+
     post = result.scalars().first()
 
     if not post:
@@ -54,6 +55,7 @@ async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_asy
     post = Post(**post_data)
 
     categories_objects = []
+
     for cat_name in new_post.categories:
         result = await session.execute(select(Category).filter_by(name=cat_name))
         category_obj = result.scalar_one_or_none()
@@ -79,6 +81,7 @@ async def update_post(
     query = select(Post).where(Post.id == post_id).options(selectinload(Post.categories))
     result: Result = await session.execute(query)
     existing_post = result.scalars().first()
+
     if not existing_post:
         raise HTTPException(status_code=404, detail="Запись не найдена.")
 

@@ -20,7 +20,7 @@ dislike_router = APIRouter(
     tags=["Dislikes 💔"]
 )
 
-
+# TODO проаннотировать reaction_data
 async def toggle_reaction(reaction_data, session: AsyncSession = Depends(get_async_session)):
     """
     Универсальная функция для установки/снятия лайка или дизлайка.
@@ -37,6 +37,8 @@ async def toggle_reaction(reaction_data, session: AsyncSession = Depends(get_asy
         Model = Dislike
         OppositeModel = Like
         reaction_name = 'дизлайк'
+
+    # TODO переименовать result
 
     # Проверяем существует ли данная реакция
     result = await session.execute(
@@ -76,7 +78,6 @@ async def toggle_reaction(reaction_data, session: AsyncSession = Depends(get_asy
         return new_reaction
 
 
-
 @like_router.post("/post/{post_id}/like", summary="Поставить/убрать лайк на пост")
 async def toggle_like_post(
         post_id: int,
@@ -98,9 +99,7 @@ async def toggle_like_post(
         content_type="post"
     )
 
-    result = await toggle_reaction(like_data, session)
-
-    return result
+    return await toggle_reaction(like_data, session)
 
 
 @like_router.post("/comment/{comment_id}/like", summary="Поставить/убрать лайк на комментарий")
@@ -119,9 +118,7 @@ async def toggle_like_comment(
         content_type="comment"
     )
 
-    result = await toggle_reaction(like_data, session)
-
-    return result
+    return await toggle_reaction(like_data, session)
 
 
 @dislike_router.post("/post/{post_id}/dislike", summary="Поставить/убрать дизлайк на пост")
@@ -145,9 +142,7 @@ async def toggle_dislike_post(
         content_type="post"
     )
 
-    result = await toggle_reaction(dislike_data, session)
-
-    return result
+    return await toggle_reaction(dislike_data, session)
 
 
 @dislike_router.post("/comment/{comment_id}/dislike", summary="Поставить/убрать дизлайк на комментарий")
@@ -166,6 +161,4 @@ async def toggle_dislike_comment(
         content_type="comment"
     )
 
-    result = await toggle_reaction(dislike_data, session)
-
-    return result
+    return await toggle_reaction(dislike_data, session)

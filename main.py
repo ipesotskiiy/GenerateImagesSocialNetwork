@@ -43,7 +43,7 @@ app.include_router(router_dislike)
 app.include_router(router_community)
 app.include_router(router_subscriptions)
 
-
+# TODO дропнуть данный метод
 @app.get("/protected-route")
 def protected_route(user: User = Depends(current_user)):
     return f"Hello, {user.username}"
@@ -56,6 +56,7 @@ async def on_startup():
         await create_seed_categories(session)
 
 
+# TODO Перенести в settings.py
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",  # Имя модуля и объекта приложения

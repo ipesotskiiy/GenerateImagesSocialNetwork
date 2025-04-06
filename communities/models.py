@@ -30,7 +30,7 @@ class Community(Base):
     name = Column(String, index=True)
     description = Column(String, nullable=True)
 
-    creator_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    creator_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
 
     community_memberships = relationship(
         "CommunityMembership",
@@ -38,4 +38,9 @@ class Community(Base):
         cascade="all, delete-orphan"
     )
     posts = relationship("Post", back_populates="communities")
-    creator = relationship("User", back_populates="created_communities", foreign_keys=[creator_id])
+    creator = relationship(
+        "User",
+        back_populates="created_communities",
+        foreign_keys=[creator_id],
+        passive_deletes=True
+    )

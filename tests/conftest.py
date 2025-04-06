@@ -6,6 +6,7 @@ from httpx import AsyncClient, ASGITransport
 from auth.models import User
 from categories.models import Category
 from comments.models import Comment
+from communities.models import Community
 from main import app
 from posts.models import Post
 from settings import get_async_session, Base
@@ -69,6 +70,8 @@ async def first_user(async_client, db_session):
 
     data = response.json()
     user_in_db = await db_session.get(User, data["id"])
+
+    await db_session.refresh(user_in_db)
     assert user_in_db is not None
     yield user_in_db
 
@@ -123,6 +126,32 @@ async def second_user(async_client, db_session):
 
     await db_session.delete(user_in_db)
     await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def authorize_second_user(async_client, db_session, second_user):
+    login_data = {
+        "username": second_user.username,
+        "password": "hard_password"
+    }
+
+    login_resp = await async_client.post(
+        "/auth/jwt/login",
+        data=login_data,
+        headers={"Content-Type": "application/x-www-form-urlencoded"}
+    )
+    assert login_resp.status_code == 200
+
+    access_token = login_resp.json()["access_token"]
+
+    async_client.headers.update({
+        "Authorization": f"Bearer {access_token}"
+    })
+
+    async_client.current_user = first_user
+
+    return async_client
+
 
 DEFAULT_CATEGORIES = {
     "Music",
@@ -240,7 +269,6 @@ async def authorized_client_with_post(async_client, db_session):
 async def authenticated_client(authorize_first_user):
     """
     Фикстура возвращает клиента, авторизованного с помощью authorize_first_user.
-    Используйте её для обращения к защищённым эндпоинтам.
     """
     return authorize_first_user
 
@@ -292,4 +320,52 @@ async def second_comment(async_client, db_session, first_user, first_post):
     yield comment_in_db
 
     await db_session.delete(comment_in_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def first_community(authenticated_client, db_session):
+    payload = {
+        "name": "Test first community",
+        "description": "Test first community description"
+    }
+
+    response = await authenticated_client.post("/communities/create/", json=payload)
+    assert response.status_code == 201
+
+    data = response.json()
+    assert "community_id" in data
+
+    community_in_db = await db_session.get(Community, data["community_id"])
+    assert community_in_db is not None
+
+    assert community_in_db.creator_id == authenticated_client.current_user.id
+
+    yield community_in_db
+
+    await db_session.delete(community_in_db)
+    await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def second_community(authenticated_client, db_session):
+    payload = {
+        "name": "Test second community",
+        "description": "Test second community description"
+    }
+
+    response = await authenticated_client.post("/communities/create/", json=payload)
+    assert response.status_code == 201
+
+    data = response.json()
+    assert "community_id" in data
+
+    community_in_db = await db_session.get(Community, data["community_id"])
+    assert community_in_db is not None
+
+    assert community_in_db.creator_id == authenticated_client.current_user.id
+
+    yield community_in_db
+
+    await db_session.delete(community_in_db)
     await db_session.commit()

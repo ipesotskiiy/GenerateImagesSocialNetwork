@@ -41,7 +41,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
-    created_communities = relationship("Community", back_populates="creator")
+    created_communities = relationship("Community", back_populates="creator", passive_deletes=True)
     followers = relationship(
         "User",
         secondary=user_subscriptions,

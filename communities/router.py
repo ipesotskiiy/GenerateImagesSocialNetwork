@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.models import User
 from categories.models import Category
 from communities.models import Community, CommunityMembership, CommunityRoleEnum
-from communities.schemas import CreateCommunity, UpdateCommunity
+from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity
 from dependencies import current_user
 from posts.models import Post
 from posts.schemas import PostCreate, PostUpdate
@@ -49,7 +49,7 @@ async def get_community(community_id: int, session: AsyncSession = Depends(get_a
     }
 
 
-@router.post("/create/", summary="Создать сообщество")
+@router.post("/create/", summary="Создать сообщество", status_code=201)
 async def create_community(
         data_for_new_community: CreateCommunity,
         current_user: User = Depends(current_user),
@@ -73,7 +73,7 @@ async def create_community(
     return {"status": "Created", "community_id": new_community.id}
 
 
-@router.patch("/update/{community_id}/", summary="Обновить сообщество")
+@router.patch("/update/{community_id}/", response_model=ReadCommunity, summary="Обновить сообщество")
 async def update_community(
         community_id: int,
         community_data: UpdateCommunity,
@@ -90,15 +90,17 @@ async def update_community(
     if existing_community.creator_id != current_user.id:
         raise HTTPException(status_code=403, detail="У вас недостаточно прав для изменения этого сообщества")
 
-    existing_community.name = community_data.name
-    existing_community.description = community_data.description
+    if community_data.name:
+        existing_community.name = community_data.name
+    if community_data.description:
+        existing_community.description = community_data.description
 
     session.add(existing_community)
 
     await session.commit()
     await session.refresh(existing_community)
 
-    return {"status": "Updated"}
+    return existing_community
 
 
 @router.delete("/delete/{community_id}/", summary="Удалить сообщество")

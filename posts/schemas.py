@@ -3,6 +3,8 @@ import datetime
 
 from pydantic import BaseModel
 
+from categories.schemas import CategoryRead
+
 
 class PostCreate(BaseModel):
     title: str
@@ -20,9 +22,10 @@ class PostRead(BaseModel):
     content: str
     created_at: datetime.datetime
     updated_at: Optional[datetime.datetime] = None
-    categories: List[str] = None
+    categories: List[CategoryRead] = None
     user_id: int
     likes_count: int
+    dislikes_count: int
 
     class Config:
         orm_mode = True
@@ -31,7 +34,7 @@ class PostRead(BaseModel):
 class PostUpdate(BaseModel):
     title: Optional[str] = None
     content: Optional[str] = None
-    categories: List[str] = None
+    categories: Optional[List[str]] = None
 
     class Config:
         orm_mode = True

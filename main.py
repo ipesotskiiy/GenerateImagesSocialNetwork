@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 
 from auth.auth import auth_backend
 from auth.models import User
@@ -18,6 +19,14 @@ logger = Logger()
 
 app = FastAPI(
     title="Team Social Network"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 logger.register_global_exceprtion_handler(app)
@@ -43,7 +52,7 @@ app.include_router(router_dislike)
 app.include_router(router_community)
 app.include_router(router_subscriptions)
 
-
+# TODO дропнуть данный метод
 @app.get("/protected-route")
 def protected_route(user: User = Depends(current_user)):
     return f"Hello, {user.username}"
@@ -56,6 +65,7 @@ async def on_startup():
         await create_seed_categories(session)
 
 
+# TODO Перенести в settings.py
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",  # Имя модуля и объекта приложения

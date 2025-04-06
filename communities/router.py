@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from auth.models import User
 from categories.models import Category
 from communities.models import Community, CommunityMembership, CommunityRoleEnum
-from communities.schemas import CreateCommunity, UpdateCommunity
+from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity
 from dependencies import current_user
 from posts.models import Post
 from posts.schemas import PostCreate, PostUpdate
@@ -49,31 +49,31 @@ async def get_community(community_id: int, session: AsyncSession = Depends(get_a
     }
 
 
-@router.post("/create/", summary="Создать сообщество")
+@router.post("/create/", summary="Создать сообщество", status_code=201)
 async def create_community(
-        new_community: CreateCommunity,
+        data_for_new_community: CreateCommunity,
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    community_data = new_community.dict()
+    community_data = data_for_new_community.dict()
     community_data["creator_id"] = current_user.id
 
-    new_comm = Community(**community_data)
-    session.add(new_comm)
+    new_community = Community(**community_data)
+    session.add(new_community)
     await session.flush()
 
     membership = CommunityMembership(
         user_id=current_user.id,
-        community_id=new_comm.id,
+        community_id=new_community.id,
         role=CommunityRoleEnum.admin
     )
     session.add(membership)
     await session.commit()
 
-    return {"status": "Created", "community_id": new_comm.id}
+    return {"status": "Created", "community_id": new_community.id}
 
 
-@router.patch("/update/{community_id}/", summary="Обновить сообщество")
+@router.patch("/update/{community_id}/", response_model=ReadCommunity, summary="Обновить сообщество")
 async def update_community(
         community_id: int,
         community_data: UpdateCommunity,
@@ -90,14 +90,17 @@ async def update_community(
     if existing_community.creator_id != current_user.id:
         raise HTTPException(status_code=403, detail="У вас недостаточно прав для изменения этого сообщества")
 
-    existing_community.name = community_data.name
-    existing_community.description = community_data.description
+    if community_data.name:
+        existing_community.name = community_data.name
+    if community_data.description:
+        existing_community.description = community_data.description
 
     session.add(existing_community)
+
     await session.commit()
     await session.refresh(existing_community)
 
-    return {"status": "Updated"}
+    return existing_community
 
 
 @router.delete("/delete/{community_id}/", summary="Удалить сообщество")
@@ -118,6 +121,7 @@ async def delete_community(
 
     await session.delete(existing_community)
     await session.commit()
+
     return {"status": "Deleted", "id": community_id}
 
 
@@ -128,12 +132,17 @@ async def assign_moderator(
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
+    # todo перенести работу с бд в отдельную дирректорию
+    #######################
     query = select(CommunityMembership).where(
         CommunityMembership.community_id == community_id,
         CommunityMembership.user_id == current_user.id
     )
+
     result = await session.execute(query)
+    #########################
     current_membership = result.scalars().first()
+
     if not current_membership or current_membership.role != CommunityRoleEnum.admin:
         raise HTTPException(status_code=403, detail="Нет прав для назначения модератора")
 
@@ -143,11 +152,13 @@ async def assign_moderator(
     )
     result = await session.execute(query)
     membership = result.scalars().first()
+
     if not membership:
         raise HTTPException(status_code=404, detail="Пользователь не найден в сообществе")
 
     membership.role = CommunityRoleEnum.moderator
     session.add(membership)
+
     await session.commit()
 
     return {"status": "Role updated", "user_id": user_id, "role": membership.role.value}
@@ -166,6 +177,7 @@ async def remove_user(
     )
     result = await session.execute(query)
     current_membership = result.scalars().first()
+
     if not current_membership:
         raise HTTPException(status_code=403, detail="Вы не состоите в этом сообществе")
 
@@ -197,6 +209,7 @@ async def toggle_subscription(
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
     community = result.scalars().first()
+
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
@@ -211,6 +224,7 @@ async def toggle_subscription(
         await session.delete(membership)
         await session.commit()
         return {"status": "unsubscribed", "community_id": community_id}
+    # TODO убрать else
     else:
         new_membership = CommunityMembership(
             user_id=current_user.id,
@@ -222,7 +236,7 @@ async def toggle_subscription(
         return {"status": "subscribed", "community_id": community_id}
 
 
-@router.post("/{community_id}/posts/", summary="Добавить пост в сообщество")
+@router.post("/{community_id}/posts/", status_code=201, summary="Добавить пост в сообщество")
 async def create_post_in_community(
         community_id: int,
         post_data: PostCreate,
@@ -232,6 +246,7 @@ async def create_post_in_community(
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
     community = result.scalars().first()
+
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
@@ -241,8 +256,10 @@ async def create_post_in_community(
     )
     result = await session.execute(query)
     membership = result.scalars().first()
+
     if not membership:
         raise HTTPException(status_code=403, detail="Вы не состоите в этом сообществе")
+
     if membership.role not in [CommunityRoleEnum.admin, CommunityRoleEnum.moderator]:
         raise HTTPException(status_code=403, detail="У вас нет прав для добавления постов в это сообщество")
 
@@ -258,6 +275,7 @@ async def create_post_in_community(
             result = await session.execute(select(Category).filter_by(name=cat_name))
             category_obj = result.scalar_one_or_none()
             categories_objects.append(category_obj)
+    # TODO подоюрать конкретный Exception
     except Exception:
         raise HTTPException(status_code=404, detail="Не найденно данной категории")
 
@@ -280,6 +298,7 @@ async def get_all_posts_in_community(
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
     community = result.scalars().first()
+
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
@@ -299,6 +318,7 @@ async def get_post_in_community(
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
     community = result.scalars().first()
+
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
@@ -308,6 +328,7 @@ async def get_post_in_community(
     )
     result = await session.execute(query)
     post = result.scalars().first()
+
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
 
@@ -325,6 +346,7 @@ async def update_post_in_community(
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
     community = result.scalars().first()
+
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
@@ -334,6 +356,7 @@ async def update_post_in_community(
     )
     result = await session.execute(query)
     membership = result.scalars().first()
+
     if not membership or membership.role not in [CommunityRoleEnum.admin, CommunityRoleEnum.moderator]:
         raise HTTPException(status_code=403, detail="Нет прав для обновления постов в этом сообществе")
 
@@ -343,6 +366,7 @@ async def update_post_in_community(
     )
     result = await session.execute(query)
     post = result.scalars().first()
+
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
 
@@ -370,6 +394,7 @@ async def delete_post_in_community(
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
     community = result.scalars().first()
+
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
@@ -380,6 +405,7 @@ async def delete_post_in_community(
     )
     result = await session.execute(query)
     membership = result.scalars().first()
+
     if not membership or membership.role not in [CommunityRoleEnum.admin, CommunityRoleEnum.moderator]:
         raise HTTPException(status_code=403, detail="Нет прав для удаления постов в этом сообществе")
 
@@ -390,6 +416,7 @@ async def delete_post_in_community(
     )
     result = await session.execute(query)
     post = result.scalars().first()
+
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
 

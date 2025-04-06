@@ -22,53 +22,40 @@ router = APIRouter(
 
 @router.get("/all/", response_model=List[PostRead], summary="Получить все посты")
 async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).options(selectinload(Post.categories)).order_by(Post.id)
+    query = select(Post).options(
+        selectinload(Post.categories),
+        selectinload(Post.likes),
+        selectinload(Post.dislikes)
+    ).order_by(Post.id)
     result: Result = await session.execute(query)
-    posts = result.scalars().all()
 
-    post_list = [
-        {
-            "id": post.id,
-            "title": post.title,
-            "content": post.content,
-            "created_at": post.created_at,
-            "categories": [category.name for category in post.categories],
-            "user_id": post.user_id,
-        }
-        for post in posts
-    ]
-
-    return post_list
+    return result.scalars().all()
 
 
 @router.get('/{post_id}/', response_model=PostRead, summary="Получить пост")
 async def get_post(post_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).where(Post.id == post_id).options(selectinload(Post.categories))
+    query = select(Post).where(Post.id == post_id).options(
+        selectinload(Post.categories),
+        selectinload(Post.likes),
+        selectinload(Post.dislikes)
+    )
     result: Result = await session.execute(query)
+
     post = result.scalars().first()
 
     if not post:
         raise HTTPException(status_code=404, detail="Запись не найдена")
 
-    post_dict = {
-        "id": post.id,
-        "title": post.title,
-        "content": post.content,
-        "created_at": post.created_at,
-        "updated_at": post.updated_at,
-        "categories": [category.name for category in post.categories],
-        "user_id": post.user_id,
-    }
-
-    return post_dict
+    return post
 
 
-@router.post('/create/', summary="Создать пост")
+@router.post('/create/', summary="Создать пост", status_code=201)
 async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_async_session)):
     post_data = new_post.dict(exclude={"categories"})
     post = Post(**post_data)
 
     categories_objects = []
+
     for cat_name in new_post.categories:
         result = await session.execute(select(Category).filter_by(name=cat_name))
         category_obj = result.scalar_one_or_none()
@@ -94,6 +81,7 @@ async def update_post(
     query = select(Post).where(Post.id == post_id).options(selectinload(Post.categories))
     result: Result = await session.execute(query)
     existing_post = result.scalars().first()
+
     if not existing_post:
         raise HTTPException(status_code=404, detail="Запись не найдена.")
 
@@ -103,13 +91,20 @@ async def update_post(
             detail="Только автор может редактировать пост."
         )
 
-    existing_post.title = post_data.title
-    existing_post.content = post_data.content
-    category_query = select(Category).where(Category.name.in_(post_data.categories))
-    category_result = await session.execute(category_query)
-    categories = category_result.scalars().all()
+    update_data = post_data.model_dump(exclude_unset=True)
 
-    existing_post.categories = categories
+    if "title" in update_data:
+        existing_post.title = update_data["title"]
+
+    if "content" in update_data:
+        existing_post.content = update_data["content"]
+
+    if "categories" in update_data:
+        category_query = select(Category).where(Category.name.in_(update_data["categories"]))
+        category_result = await session.execute(category_query)
+        categories = category_result.scalars().all()
+        existing_post.categories = categories
+
     session.add(existing_post)
     await session.commit()
     await session.refresh(existing_post)

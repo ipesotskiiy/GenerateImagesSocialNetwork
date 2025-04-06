@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from categories.models import Category
 from settings import get_async_session
 
+# TODO Перенести константу в settings.py
 DEFAULT_CATEGORIES = {
     "Music",
     "Books",

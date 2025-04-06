@@ -1,4 +1,5 @@
 from fastapi_users import FastAPIUsers
+
 from auth.manager import get_user_manager
 from auth.auth import auth_backend
 from auth.models import User

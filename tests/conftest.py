@@ -369,3 +369,49 @@ async def second_community(authenticated_client, db_session):
 
     await db_session.delete(community_in_db)
     await db_session.commit()
+
+
+@pytest_asyncio.fixture
+async def first_post_in_community(authenticated_client, db_session, first_user, first_community, seed_categories):
+    payload = {
+        "title": "First test post in community",
+        "content": "First test post in community content",
+        "categories": [
+            "Books"
+        ],
+        "user_id": first_user.id
+    }
+
+    response = await authenticated_client.post(f"/communities/{first_community.id}/posts/", json=payload)
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert "post_id" in data
+
+    post_in_db = await db_session.get(Post, data["post_id"])
+    assert post_in_db is not None
+    yield post_in_db
+
+
+@pytest_asyncio.fixture
+async def second_post_in_community(authenticated_client, db_session, first_user, first_community, seed_categories):
+    payload = {
+        "title": "Second test post in community",
+        "content": "Second test post in community content",
+        "categories": [
+            "Books"
+        ],
+        "user_id": first_user.id
+    }
+
+    response = await authenticated_client.post(f"/communities/{first_community.id}/posts/", json=payload)
+    assert response.status_code == 201
+
+    data = response.json()
+
+    assert "post_id" in data
+
+    post_in_db = await db_session.get(Post, data["post_id"])
+    assert post_in_db is not None
+    yield post_in_db

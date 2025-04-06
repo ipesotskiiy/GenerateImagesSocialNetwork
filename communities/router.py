@@ -236,7 +236,7 @@ async def toggle_subscription(
         return {"status": "subscribed", "community_id": community_id}
 
 
-@router.post("/{community_id}/posts/", summary="Добавить пост в сообщество")
+@router.post("/{community_id}/posts/", status_code=201, summary="Добавить пост в сообщество")
 async def create_post_in_community(
         community_id: int,
         post_data: PostCreate,

@@ -2,6 +2,8 @@ import os
 import logging
 from typing import AsyncGenerator
 
+import redis
+from celery import Celery
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
@@ -24,7 +26,21 @@ Base = declarative_base()
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
+redis_database = redis.Redis(host="localhost", port=6379, db=1)
+redis_url = os.environ.get("REDIS_URL")
+
+celery_app = Celery(
+    'celery_worker',
+    broker=redis_url,
+    backend=redis_url
+)
+
+# celery_app.autodiscover_tasks(["/tasks.tasks.py"])
+celery_app.conf.update(result_expires=10000)
+
+
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         yield session
+

@@ -2,6 +2,6 @@
 __pycache__/
 .env
 /team_network_venv
-/media/avatars
+/media/avatar
 /media/avatars_tmp
-/logging_files/
+logging_files/

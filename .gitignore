@@ -1,5 +1,7 @@
 .idea/
 __pycache__/
 .env
-logging_files/
 /team_network_venv
+/media/avatars
+/media/avatars_tmp
+/logging_files/

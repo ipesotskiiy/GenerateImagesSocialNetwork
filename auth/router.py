@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+import shutil
+import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from celery_main import celery_app
+from celery_tasks import process_avatar
 from dependencies import current_user
 from auth.models import User
-from settings import get_async_session
+from settings import get_async_session, MEDIA_TEMP_AVATAR_URL, MEDIA_AVATAR_URL
 
 router = APIRouter(
     prefix="/subscriptions",
@@ -37,3 +42,16 @@ async def toggle_follow_user(
         current_user.following.append(user_to_follow)
         await session.commit()
         return {"message": f"Вы успешно подписались на {user_to_follow.username}"}
+
+
+@router.post("/user/{user_id}/avatar/", summary="Установить пользователю аватар")
+async def upload_avatar(user_id: int, file: UploadFile = File(...)):
+    temp_path = f"{MEDIA_TEMP_AVATAR_URL}/{uuid.uuid4()}_{file.filename}"
+    with open(temp_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    celery_app.send_task(
+        "celery_tasks.process_avatar.process_avatar",
+        args=[user_id, temp_path, MEDIA_AVATAR_URL]
+    )
+    return {"status": "processing"}

@@ -27,6 +27,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     bio = Column(String(2000))
     date_of_birth = Column(Date, nullable=True)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
+    avatar_url = Column(String, nullable=True)
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)

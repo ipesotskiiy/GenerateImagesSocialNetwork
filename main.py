@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from auth.auth import auth_backend
-from auth.router import router as router_subscriptions
+from auth.router import router as router_subscriptions, router_user_images
 from auth.schemas import UserRead, UserCreate
 from dependencies import fastapi_users
 from logging_config import Logger
@@ -44,6 +44,7 @@ app.include_router(
 
 current_user = fastapi_users.current_user()
 
+app.include_router(router_user_images)
 app.include_router(router_posts)
 app.include_router(router_comments)
 app.include_router(router_like)

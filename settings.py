@@ -37,6 +37,8 @@ BASE_DIR = Path(__file__).resolve().parent
 MEDIA_URL = os.path.join(BASE_DIR, "media")
 MEDIA_AVATAR_URL = os.path.join(MEDIA_URL, "avatar")
 MEDIA_TEMP_AVATAR_URL = os.path.join(MEDIA_URL, "avatars_tmp")
+MEDIA_USER_PHOTOS_URL = os.path.join(MEDIA_URL, "user_photo")
+MEDIA_TEMP_USER_PHOTOS_URL = os.path.join(MEDIA_URL, "user_photos_tmp")
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

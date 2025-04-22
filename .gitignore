@@ -4,4 +4,6 @@ __pycache__/
 /team_network_venv
 /media/avatar
 /media/avatars_tmp
+/media/user_photo
+/media/user_photos_tmp
 logging_files/

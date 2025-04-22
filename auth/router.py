@@ -1,15 +1,17 @@
+import os
 import shutil
 import uuid
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from celery_main import celery_app
-from celery_tasks import process_avatar
+from celery_tasks import process_avatar, process_gallery
 from dependencies import current_user
 from auth.models import User
-from settings import get_async_session, MEDIA_TEMP_AVATAR_URL, MEDIA_AVATAR_URL
+from settings import get_async_session, MEDIA_TEMP_AVATAR_URL, MEDIA_AVATAR_URL, MEDIA_TEMP_USER_PHOTOS_URL
 
 router = APIRouter(
     prefix="/subscriptions",
@@ -55,3 +57,24 @@ async def upload_avatar(user_id: int, file: UploadFile = File(...)):
         args=[user_id, temp_path, MEDIA_AVATAR_URL]
     )
     return {"status": "processing"}
+
+
+@router.post("/users/{user_id}/photos/")
+async def upload_photos(user_id: int, files: list[UploadFile] = File(...)):
+    os.makedirs(MEDIA_TEMP_USER_PHOTOS_URL, exist_ok=True)
+
+    for file in files:
+        tmp_name = f"{uuid.uuid4()}_{file.filename}"
+        tmp_path = os.path.join(MEDIA_TEMP_USER_PHOTOS_URL, tmp_name)
+
+        # Сохраняем во временное хранилище
+        with open(tmp_path, "wb") as buf:
+            buf.write(await file.read())
+
+        celery_app.send_task(
+            "celery_tasks.process_gallery.process_gallery",
+            args=[user_id, tmp_path]
+        )
+
+    return {"status": "processing", "count": len(files)}
+

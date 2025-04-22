@@ -17,7 +17,7 @@ from settings import (
 )
 
 from posts.models import Post, post_categories
-from auth.models import User, user_subscriptions
+from auth.models import User, user_subscriptions, UserGallery
 from comments.models import Comment
 from categories.models import Category
 from like_dislike.models import Like, Dislike

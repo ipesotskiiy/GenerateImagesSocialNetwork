@@ -1,4 +1,4 @@
-from auth.models import User
+from auth.models import User, UserGallery
 from posts.models import Post
 from comments.models import Comment
 from like_dislike.models import Like, Dislike

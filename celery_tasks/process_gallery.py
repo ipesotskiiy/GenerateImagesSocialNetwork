@@ -42,10 +42,8 @@ def process_gallery(user_id: int, temp_path: str):
         db.add(gallery_item)
         db.commit()
 
-        # подтягиваем обратно все поля из БД
         db.refresh(gallery_item)
 
-        # забираем в локальные переменные
         result = {
             "id": gallery_item.id,
             "url": gallery_item.url,

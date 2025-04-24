@@ -13,4 +13,6 @@ celery_app = Celery(
 from celery_tasks.process_avatar import process_avatar
 from celery_tasks.process_gallery import process_gallery
 from celery_tasks.delete_media import delete_media
+from celery_tasks.upload_comment_image import upload_comment_image
+from celery_tasks.delete_comment_image import delete_comment_image
 celery_app.conf.update(result_expires=10000)

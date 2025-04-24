@@ -6,4 +6,6 @@ __pycache__/
 /media/avatars_tmp
 /media/user_photo
 /media/user_photos_tmp
+/media/comment_images
+/media/comment_images_tmp
 logging_files/

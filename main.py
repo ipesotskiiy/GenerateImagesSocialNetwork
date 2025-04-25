@@ -7,7 +7,7 @@ from auth.router import router as router_subscriptions, router_user_images
 from auth.schemas import UserRead, UserCreate
 from dependencies import fastapi_users
 from logging_config import Logger
-from posts.router import router as router_posts
+from posts.router import router as router_posts, router_post_images
 from comments.router import router as router_comments, router_comment_images
 from settings import async_session_maker
 from startup import create_seed_categories
@@ -46,6 +46,7 @@ current_user = fastapi_users.current_user()
 
 app.include_router(router_user_images)
 app.include_router(router_posts)
+app.include_router(router_post_images)
 app.include_router(router_comments)
 app.include_router(router_comment_images)
 app.include_router(router_like)

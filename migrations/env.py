@@ -16,7 +16,7 @@ from settings import (
     Base
 )
 
-from posts.models import Post, post_categories
+from posts.models import Post, post_categories, PostImages
 from auth.models import User, user_subscriptions, UserGallery
 from comments.models import Comment, CommentImages
 from categories.models import Category

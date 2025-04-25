@@ -41,6 +41,8 @@ MEDIA_USER_PHOTOS_URL = os.path.join(MEDIA_URL, "user_photo")
 MEDIA_TEMP_USER_PHOTOS_URL = os.path.join(MEDIA_URL, "user_photos_tmp")
 MEDIA_COMMENT_IMAGES_URL = os.path.join(MEDIA_URL, "comment_images")
 MEDIA_TEMP_COMMENT_IMAGES_URL = os.path.join(MEDIA_URL, "comment_images_tmp")
+MEDIA_POST_IMAGES_URL = os.path.join(MEDIA_URL, "post_images")
+MEDIA_TEMP_POST_IMAGES_URL = os.path.join(MEDIA_URL, "post_images_tmp")
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

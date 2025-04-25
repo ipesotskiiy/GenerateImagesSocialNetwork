@@ -8,4 +8,6 @@ __pycache__/
 /media/user_photos_tmp
 /media/comment_images
 /media/comment_images_tmp
+/media/post_images
+/media/post_images_tmp
 logging_files/

@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func, Table, and_
+from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func, Table, and_, TIMESTAMP
 from sqlalchemy.orm import relationship, foreign
 
 from like_dislike.models import Like, Dislike
@@ -15,6 +15,22 @@ post_categories = Table(
 )
 
 
+class PostImages(Base):
+    __tablename__ = "post_images"
+
+    id = Column(Integer, primary_key=True, index=True)
+    url = Column(String, nullable=False)
+    thumbnail_url = Column(String, nullable=True)
+    uploaded_at = Column(TIMESTAMP, default=datetime.datetime.utcnow)
+
+    post_id = Column(Integer, ForeignKey("post.id"), nullable=False, index=True)
+
+    post = relationship(
+        "Post",
+        back_populates="images"
+    )
+
+
 class Post(Base):
     __tablename__ = "post"
 
@@ -27,7 +43,6 @@ class Post(Base):
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     community_id = Column(Integer, ForeignKey("community.id"), nullable=True)
 
-    # Связи
     author = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
     categories = relationship("Category", secondary="post_categories", back_populates="posts")
@@ -48,6 +63,11 @@ class Post(Base):
         viewonly=True
     )
     communities = relationship("Community", back_populates="posts")
+    images = relationship(
+        "PostImages",
+        back_populates="post",
+        cascade="all, delete-orphan"
+    )
 
     @property
     def likes_count(self):

@@ -15,4 +15,5 @@ from celery_tasks.process_gallery import process_gallery
 from celery_tasks.delete_media import delete_media
 from celery_tasks.upload_comment_image import upload_comment_image
 from celery_tasks.delete_comment_image import delete_comment_image
+from celery_tasks.upload_post_image import upload_post_image
 celery_app.conf.update(result_expires=10000)

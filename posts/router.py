@@ -172,7 +172,7 @@ async def upload_images(post_id: int, files: list[UploadFile] = File(...)):
     summary="Удалить изображение с поста",
     status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_comment_images(
+async def delete_post_images(
         post_id: int,
         image_id: int,
         session: AsyncSession = Depends(get_async_session)
@@ -202,7 +202,7 @@ async def delete_comment_images(
         else:
             rel = p.lstrip("/")
             full_path = os.path.join(BASE_DIR, rel)
-            celery_app.send_task(
+        celery_app.send_task(
                 "celery_tasks.delete_post_image",
                 args=[full_path]
             )

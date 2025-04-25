@@ -5,8 +5,8 @@ from celery import shared_task
 from settings import BASE_DIR
 
 
-@shared_task(name="celery_tasks.delete_comment_images")
-def delete_comment_image(path: str):
+@shared_task(name="celery_tasks.delete_post_image")
+def delete_post_image(path: str):
     if not os.path.isabs(path):
         path = os.path.join(BASE_DIR, path)
 

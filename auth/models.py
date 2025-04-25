@@ -2,7 +2,7 @@ from datetime import datetime, date
 from typing import Optional
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
-from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date, Table, ForeignKey
+from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date, Table, ForeignKey, Computed
 from sqlalchemy.orm import relationship
 
 from settings import Base
@@ -49,6 +49,14 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
+    age = Column(
+        Integer,
+        Computed(
+            "DATE_PART('year', AGE(CURRENT_DATE, date_of_birth))",
+            persisted=True
+        ),
+        nullable=True
+    )
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")
@@ -80,12 +88,3 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         cascade="all, delete-orphan"
     )
 
-    @property
-    def age(self) -> Optional[int]:
-        """Вычисляет возраст на основе даты рождения."""
-        if self.date_of_birth:
-            today = date.today()
-            return today.year - self.date_of_birth.year - (
-                    (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
-            )
-        return None

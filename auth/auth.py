@@ -1,10 +1,6 @@
-from fastapi_users.authentication import AuthenticationBackend, BearerTransport, JWTStrategy
+from fastapi_users.authentication import AuthenticationBackend, JWTStrategy
 
-#TODO добавить в settings.py
-SECRET = "SECRET"
-
-#TODO путь в settings.py
-bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
+from settings import SECRET, bearer_transport
 
 
 def get_jwt_strategy() -> JWTStrategy:

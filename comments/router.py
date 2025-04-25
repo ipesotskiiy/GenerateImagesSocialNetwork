@@ -87,10 +87,8 @@ async def update_comment(
             detail="Только автор может редактировать комментарий."
         )
 
-    # Обновление текста комментария
     existing_comment.text = comment_data.text
 
-    # Сохранение изменений
     session.add(existing_comment)
 
     await session.commit()

@@ -30,9 +30,8 @@ async def toggle_follow_user(
 ):
     await session.refresh(current_user, attribute_names=["following"])
 
-    # TODO переименовать переменную
-    stmt = select(User).where(User.id == user_id)
-    result = await session.execute(stmt)
+    user = select(User).where(User.id == user_id)
+    result = await session.execute(user)
     user_to_follow = result.scalars().first()
 
     if not user_to_follow:
@@ -42,11 +41,9 @@ async def toggle_follow_user(
         current_user.following.remove(user_to_follow)
         await session.commit()
         return {"message": f"Вы успешно отписались от {user_to_follow.username}"}
-    # TODO убрать else
-    else:
-        current_user.following.append(user_to_follow)
-        await session.commit()
-        return {"message": f"Вы успешно подписались на {user_to_follow.username}"}
+    current_user.following.append(user_to_follow)
+    await session.commit()
+    return {"message": f"Вы успешно подписались на {user_to_follow.username}"}
 
 
 @router_user_images.post("/user/{user_id}/avatar/", summary="Установить пользователю аватар")

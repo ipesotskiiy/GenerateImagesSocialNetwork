@@ -15,6 +15,23 @@ user_subscriptions = Table(
 )
 
 
+class UserGallery(Base):
+    __tablename__ = 'user_gallery'
+
+    id = Column(Integer, primary_key=True, index=True)
+    url = Column(String, nullable=False)
+    thumbnail_url = Column(String, nullable=True)
+    uploaded_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False, index=True)
+
+    user = relationship(
+        "User",
+        back_populates="galleries"
+    )
+
+
+
 class User(SQLAlchemyBaseUserTable[int], Base):
     __tablename__ = 'user'
 
@@ -27,6 +44,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     bio = Column(String(2000))
     date_of_birth = Column(Date, nullable=True)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
+    avatar_url = Column(String, nullable=True)
     hashed_password = Column(String(length=1024), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
@@ -55,6 +73,11 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         primaryjoin=(user_subscriptions.c.follower_id == id),
         secondaryjoin=(user_subscriptions.c.following_id == id),
         back_populates="followers"
+    )
+    galleries = relationship(
+        "UserGallery",
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
     @property

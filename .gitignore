@@ -1,4 +1,13 @@
 .idea/
 __pycache__/
 .env
+/team_network_venv
+/media/avatar
+/media/avatars_tmp
+/media/user_photo
+/media/user_photos_tmp
+/media/comment_images
+/media/comment_images_tmp
+/media/post_images
+/media/post_images_tmp
 logging_files/

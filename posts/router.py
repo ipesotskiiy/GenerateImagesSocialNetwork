@@ -1,22 +1,30 @@
+import os
+import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from sqlalchemy import select, delete
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from auth.models import User
 from categories.models import Category
-from posts.models import Post
+from celery_main import celery_app
+from posts.models import Post, PostImages
 from posts.schemas import PostCreate, PostUpdate, PostRead
-from settings import get_async_session
+from settings import get_async_session, MEDIA_TEMP_POST_IMAGES_URL, BASE_DIR
 from dependencies import current_user
 
 router = APIRouter(
     prefix="/posts",
     tags=["Posts 📖"]
 
+)
+
+router_post_images = APIRouter(
+    prefix="/posts_images",
+    tags=["Posts Images 📸"]
 )
 
 
@@ -135,3 +143,68 @@ async def delete_post(
     await session.commit()
 
     return {"status": "Deleted", "id": post_id}
+
+
+@router_post_images.post(
+    "/upload_images/{post_id}/",
+    summary="Прикрепить изображение к посту",
+    status_code=status.HTTP_201_CREATED
+)
+async def upload_images(post_id: int, files: list[UploadFile] = File(...)):
+    os.makedirs(MEDIA_TEMP_POST_IMAGES_URL, exist_ok=True)
+
+    for file in files:
+        tmp_name = f"{uuid.uuid4()}_{file.filename}"
+        tmp_path = os.path.join(MEDIA_TEMP_POST_IMAGES_URL, tmp_name)
+
+        with open(tmp_path, "wb") as buf:
+            buf.write(await file.read())
+
+        celery_app.send_task(
+            "celery_tasks.upload_post_image.upload_post_image",
+            args=[post_id, tmp_path]
+        )
+    return {"status": "processing", "count": len(files)}
+
+
+@router_post_images.delete(
+    "/delete_images/{post_id}/image/{image_id}",
+    summary="Удалить изображение с поста",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_post_images(
+        post_id: int,
+        image_id: int,
+        session: AsyncSession = Depends(get_async_session)
+):
+    result = await session.execute(
+        select(PostImages).where(
+            PostImages.id == image_id,
+            PostImages.post_id == post_id
+        )
+    )
+    image = result.scalars().first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    raw_paths = []
+    if image.url:
+        raw_paths.append(image.url)
+    if image.thumbnail_url:
+        raw_paths.append(image.thumbnail_url)
+
+    await session.execute(delete(PostImages).where(PostImages.id==image_id))
+    await session.commit()
+
+    for p in raw_paths:
+        if os.path.isabs(p):
+            full_path = p
+        else:
+            rel = p.lstrip("/")
+            full_path = os.path.join(BASE_DIR, rel)
+        celery_app.send_task(
+                "celery_tasks.delete_post_image",
+                args=[full_path]
+            )
+    return
+

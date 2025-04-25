@@ -1,15 +1,14 @@
 import uvicorn
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from auth.auth import auth_backend
-from auth.models import User
-from auth.router import router as router_subscriptions
+from auth.router import router as router_subscriptions, router_user_images
 from auth.schemas import UserRead, UserCreate
 from dependencies import fastapi_users
 from logging_config import Logger
-from posts.router import router as router_posts
-from comments.router import router as router_comments
+from posts.router import router as router_posts, router_post_images
+from comments.router import router as router_comments, router_comment_images
 from settings import async_session_maker
 from startup import create_seed_categories
 from like_dislike.router import like_router as router_like, dislike_router as router_dislike
@@ -45,18 +44,15 @@ app.include_router(
 
 current_user = fastapi_users.current_user()
 
+app.include_router(router_user_images)
 app.include_router(router_posts)
+app.include_router(router_post_images)
 app.include_router(router_comments)
+app.include_router(router_comment_images)
 app.include_router(router_like)
 app.include_router(router_dislike)
 app.include_router(router_community)
 app.include_router(router_subscriptions)
-
-# TODO дропнуть данный метод
-@app.get("/protected-route")
-def protected_route(user: User = Depends(current_user)):
-    return f"Hello, {user.username}"
-
 
 @app.on_event("startup")
 async def on_startup():

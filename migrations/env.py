@@ -16,9 +16,9 @@ from settings import (
     Base
 )
 
-from posts.models import Post, post_categories
-from auth.models import User, user_subscriptions
-from comments.models import Comment
+from posts.models import Post, post_categories, PostImages
+from auth.models import User, user_subscriptions, UserGallery
+from comments.models import Comment, CommentImages
 from categories.models import Category
 from like_dislike.models import Like, Dislike
 from communities.models import Community

@@ -6,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from categories.models import Category
+from communities.community_db_interface import CommunityDBInterface
 from communities.models import Community, CommunityMembership, CommunityRoleEnum
-from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity
+from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity, CommunityDelete
 from dependencies import current_user
 from posts.models import Post
 from posts.schemas import PostCreate, PostUpdate, PostRead
@@ -18,28 +19,16 @@ router = APIRouter(
     tags=["Communities 👪"]
 )
 
+community_db_interface = CommunityDBInterface()
 
 @router.get("/all/", response_model=List[ReadCommunity], summary="Взять все сообщества")
 async def get_all_communities(session: AsyncSession = Depends(get_async_session)):
-    query = select(Community).order_by(Community.id)
-    result = await session.execute(query)
-    communities = result.scalars().all()
-
-    return [
-        {
-            "id": community.id,
-            "name": community.name,
-            "description": community.description
-        }
-        for community in communities
-    ]
-
+    communities = await community_db_interface.fetch_all(session)
+    return communities
 
 @router.get("/{community_id}/", response_model=ReadCommunity, summary="Взять сообщество")
 async def get_community(community_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+    community = await community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
@@ -47,28 +36,21 @@ async def get_community(community_id: int, session: AsyncSession = Depends(get_a
     return community
 
 
-@router.post("/create/", response_model=ReadCommunity, summary="Создать сообщество", status_code=201)
+@router.post("/create/", response_model=CreateCommunity, summary="Создать сообщество", status_code=201)
 async def create_community(
-        data_for_new_community: CreateCommunity,
-        current_user: User = Depends(current_user),
-        session: AsyncSession = Depends(get_async_session)
+    data_for_new_community: CreateCommunity,
+    current_user: User = Depends(current_user),
+    session: AsyncSession = Depends(get_async_session)
 ):
     community_data = data_for_new_community.dict()
     community_data["creator_id"] = current_user.id
 
     new_community = Community(**community_data)
     session.add(new_community)
-    await session.flush()
-
-    membership = CommunityMembership(
-        user_id=current_user.id,
-        community_id=new_community.id,
-        role=CommunityRoleEnum.admin
-    )
-    session.add(membership)
     await session.commit()
+    await session.refresh(new_community)
 
-    return {"status": "Created", "community_id": new_community.id}
+    return new_community
 
 
 @router.patch("/update/{community_id}/", response_model=ReadCommunity, summary="Обновить сообщество")
@@ -78,9 +60,7 @@ async def update_community(
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session),
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    existing_community = result.scalars().first()
+    existing_community = await community_db_interface.fetch_one(session, community_id)
 
     if not existing_community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
@@ -101,15 +81,13 @@ async def update_community(
     return existing_community
 
 
-@router.delete("/delete/{community_id}/", summary="Удалить сообщество")
+@router.delete("/delete/{community_id}/", response_model=CommunityDelete, summary="Удалить сообщество")
 async def delete_community(
         community_id: int,
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    existing_community = result.scalars().first()
+    existing_community = await community_db_interface.fetch_one(session, community_id)
 
     if not existing_community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")

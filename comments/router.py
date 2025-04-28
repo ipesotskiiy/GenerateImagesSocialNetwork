@@ -3,13 +3,12 @@ import uuid
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from celery_main import celery_app
-from comments.db_interface import CommentsDBInterface, CommentImagesDBInterface
-from comments.models import Comment, CommentImages
+from comments.comments_db_interface import CommentsDBInterface, CommentImagesDBInterface
+from comments.models import Comment
 from comments.schemas import CommentCreate, CommentUpdate, CommentRead, CommentDelete
 from settings import get_async_session, MEDIA_TEMP_COMMENT_IMAGES_URL, BASE_DIR
 from dependencies import current_user

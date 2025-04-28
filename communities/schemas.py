@@ -10,7 +10,6 @@ class BaseCommunity(BaseModel):
 class CreateCommunity(BaseCommunity):
     pass
 
-
 class ReadCommunity(BaseCommunity):
     id: int
     creator_id: int
@@ -22,3 +21,7 @@ class ReadCommunity(BaseCommunity):
 class UpdateCommunity(BaseCommunity):
     class Config:
         orm_mode = True
+
+class CommunityDelete(BaseModel):
+    status: str
+    id: int

@@ -1,5 +1,4 @@
-from datetime import datetime, date
-from typing import Optional
+from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import Column, Integer, String, TIMESTAMP, Boolean, Date, Table, ForeignKey, Computed

@@ -57,7 +57,7 @@ async def get_post(post_id: int, session: AsyncSession = Depends(get_async_sessi
     return post
 
 
-@router.post('/create/', summary="Создать пост", status_code=201)
+@router.post('/create/', response_model=PostRead, summary="Создать пост", status_code=201)
 async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_async_session)):
     post_data = new_post.dict(exclude={"categories"})
     post = Post(**post_data)
@@ -79,7 +79,7 @@ async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_asy
     return {"status": "Created", "id": post.id}
 
 
-@router.patch("/update/{post_id}/", summary="Обновить пост")
+@router.patch("/update/{post_id}/", response_model=PostRead, summary="Обновить пост")
 async def update_post(
         post_id: int,
         post_data: PostUpdate,

@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +10,7 @@ from communities.models import Community, CommunityMembership, CommunityRoleEnum
 from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity
 from dependencies import current_user
 from posts.models import Post
-from posts.schemas import PostCreate, PostUpdate
+from posts.schemas import PostCreate, PostUpdate, PostRead
 from settings import get_async_session
 
 router = APIRouter(
@@ -17,7 +19,7 @@ router = APIRouter(
 )
 
 
-@router.get("/all/", summary="Взять все сообщества")
+@router.get("/all/", response_model=List[ReadCommunity], summary="Взять все сообщества")
 async def get_all_communities(session: AsyncSession = Depends(get_async_session)):
     query = select(Community).order_by(Community.id)
     result = await session.execute(query)
@@ -33,7 +35,7 @@ async def get_all_communities(session: AsyncSession = Depends(get_async_session)
     ]
 
 
-@router.get("/{community_id}/", summary="Взять сообщество")
+@router.get("/{community_id}/", response_model=ReadCommunity, summary="Взять сообщество")
 async def get_community(community_id: int, session: AsyncSession = Depends(get_async_session)):
     query = select(Community).where(Community.id == community_id)
     result = await session.execute(query)
@@ -42,14 +44,10 @@ async def get_community(community_id: int, session: AsyncSession = Depends(get_a
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    return {
-        "id": community.id,
-        "name": community.name,
-        "description": community.description
-    }
+    return community
 
 
-@router.post("/create/", summary="Создать сообщество", status_code=201)
+@router.post("/create/", response_model=ReadCommunity, summary="Создать сообщество", status_code=201)
 async def create_community(
         data_for_new_community: CreateCommunity,
         current_user: User = Depends(current_user),
@@ -236,7 +234,7 @@ async def toggle_subscription(
         return {"status": "subscribed", "community_id": community_id}
 
 
-@router.post("/{community_id}/posts/", status_code=201, summary="Добавить пост в сообщество")
+@router.post("/{community_id}/posts/", response_model=PostRead, status_code=201, summary="Добавить пост в сообщество")
 async def create_post_in_community(
         community_id: int,
         post_data: PostCreate,
@@ -290,7 +288,7 @@ async def create_post_in_community(
     return {"status": "Post created", "post_id": new_post.id}
 
 
-@router.get("/{community_id}/posts/", summary="Получить все посты в сообществе")
+@router.get("/{community_id}/posts/", response_model=List[PostRead], summary="Получить все посты в сообществе")
 async def get_all_posts_in_community(
         community_id: int,
         session: AsyncSession = Depends(get_async_session)
@@ -309,7 +307,7 @@ async def get_all_posts_in_community(
     return posts
 
 
-@router.get("/{community_id}/posts/{post_id}/", summary="Получить пост по ID в сообществе")
+@router.get("/{community_id}/posts/{post_id}/", response_model=PostRead, summary="Получить пост по ID в сообществе")
 async def get_post_in_community(
         community_id: int,
         post_id: int,
@@ -335,7 +333,7 @@ async def get_post_in_community(
     return post
 
 
-@router.patch("/{community_id}/posts/{post_id}/", summary="Обновить пост в сообществе")
+@router.patch("/{community_id}/posts/{post_id}/", response_model=PostRead, summary="Обновить пост в сообществе")
 async def update_post_in_community(
         community_id: int,
         post_id: int,

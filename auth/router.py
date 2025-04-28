@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from auth.user_db_interface import UserDBInterface
 from celery_main import celery_app
 from dependencies import current_user
 from auth.models import User, UserGallery
@@ -21,6 +22,7 @@ router_user_images = APIRouter(
     tags=["User media 🖼️"]
 )
 
+user_db_interface = UserDBInterface()
 
 @router.post("/follow/{user_id}", summary="Подписаться/Отписаться от пользователя")
 async def toggle_follow_user(
@@ -89,13 +91,8 @@ async def delete_photos(
     photo_id: int,
     session: AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(
-        select(UserGallery).where(
-            UserGallery.id == photo_id,
-            UserGallery.user_id == user_id
-        )
-    )
-    photo = result.scalars().first()
+
+    photo = await user_db_interface.fetch_one(session, photo_id, user_id)
     if not photo:
         raise HTTPException(status_code=404, detail="Photo not found")
 
@@ -105,8 +102,7 @@ async def delete_photos(
     if photo.thumbnail_url:
         raw_paths.append(photo.thumbnail_url)
 
-    await session.execute(delete(UserGallery).where(UserGallery.id == photo_id))
-    await session.commit()
+    await user_db_interface.delete_one(session, photo_id)
 
     for p in raw_paths:
         if os.path.isabs(p):

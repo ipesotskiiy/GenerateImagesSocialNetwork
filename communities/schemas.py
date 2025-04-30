@@ -25,3 +25,16 @@ class UpdateCommunity(BaseCommunity):
 class CommunityDelete(BaseModel):
     status: str
     id: int
+
+class AssignModerator(BaseModel):
+    status: str
+    user_id: int
+    role: str
+
+class RemoveUser(BaseModel):
+    status: str
+    user_id: int
+
+class ToggleSubscription(BaseModel):
+    status: str
+    community_id: int

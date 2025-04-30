@@ -1,14 +1,15 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from categories.models import Category
-from communities.community_db_interface import CommunityDBInterface
+from communities.community_db_interface import CommunityDBInterface, CommunityMembershipDBInterface
 from communities.models import Community, CommunityMembership, CommunityRoleEnum
-from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity, CommunityDelete
+from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity, CommunityDelete, AssignModerator, \
+    RemoveUser, ToggleSubscription
 from dependencies import current_user
 from posts.models import Post
 from posts.schemas import PostCreate, PostUpdate, PostRead
@@ -20,6 +21,7 @@ router = APIRouter(
 )
 
 community_db_interface = CommunityDBInterface()
+community_membership_db_interface = CommunityMembershipDBInterface()
 
 @router.get("/all/", response_model=List[ReadCommunity], summary="Взять все сообщества")
 async def get_all_communities(session: AsyncSession = Depends(get_async_session)):
@@ -49,6 +51,10 @@ async def create_community(
     session.add(new_community)
     await session.commit()
     await session.refresh(new_community)
+    community_membership = CommunityMembership(user_id=current_user.id, community_id=new_community.id, role='admin')
+    session.add(community_membership)
+    await session.commit()
+    await session.refresh(community_membership)
 
     return new_community
 
@@ -101,68 +107,65 @@ async def delete_community(
     return {"status": "Deleted", "id": community_id}
 
 
-@router.post("/{community_id}/assign_moderator/{user_id}/", summary="Назначить модератора")
+@router.post(
+    "/{community_id}/assign_moderator/{user_id}/",
+    response_model=AssignModerator,
+    summary="Назначить модератора"
+)
 async def assign_moderator(
-        community_id: int,
-        user_id: int,
-        current_user: User = Depends(current_user),
-        session: AsyncSession = Depends(get_async_session)
+    community_id: int,
+    user_id: int,
+    current_user: User = Depends(current_user),
+    session: AsyncSession = Depends(get_async_session)
 ):
-    # todo перенести работу с бд в отдельную дирректорию
-    #######################
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == current_user.id
+    admin_membership = await community_membership_db_interface.fetch_one(
+        session, community_id, current_user.id
     )
+    if not admin_membership or admin_membership.role != CommunityRoleEnum.admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Нет прав для назначения модератора"
+        )
 
-    result = await session.execute(query)
-    #########################
-    current_membership = result.scalars().first()
-
-    if not current_membership or current_membership.role != CommunityRoleEnum.admin:
-        raise HTTPException(status_code=403, detail="Нет прав для назначения модератора")
-
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == user_id
+    new_membership = await community_membership_db_interface.fetch_one(
+        session, community_id, user_id
     )
-    result = await session.execute(query)
-    membership = result.scalars().first()
+    if not new_membership:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь не найден в сообществе"
+        )
 
-    if not membership:
-        raise HTTPException(status_code=404, detail="Пользователь не найден в сообществе")
+    new_membership.role = CommunityRoleEnum.moderator
 
-    membership.role = CommunityRoleEnum.moderator
-    session.add(membership)
-
+    session.add(new_membership)
     await session.commit()
 
-    return {"status": "Role updated", "user_id": user_id, "role": membership.role.value}
+    return {
+        "status": "Role updated",
+        "user_id": user_id,
+        "role": new_membership.role.value
+    }
 
 
-@router.delete("/{community_id}/remove_user/{user_id}/", summary="Удалить участника из сообщества")
+@router.delete(
+    "/{community_id}/remove_user/{user_id}/",
+    response_model=RemoveUser,
+    summary="Удалить участника из сообщества"
+)
 async def remove_user(
         community_id: int,
         user_id: int,
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == current_user.id
-    )
-    result = await session.execute(query)
-    current_membership = result.scalars().first()
+
+    current_membership = await community_membership_db_interface.fetch_one(session, community_id, current_user.id)
 
     if not current_membership:
         raise HTTPException(status_code=403, detail="Вы не состоите в этом сообществе")
 
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == user_id
-    )
-    result = await session.execute(query)
-    target_membership = result.scalars().first()
+    target_membership = await community_membership_db_interface.fetch_one(session, community_id, user_id)
 
     if not target_membership:
         raise HTTPException(status_code=404, detail="Пользователь не найден в сообществе")
@@ -176,40 +179,37 @@ async def remove_user(
     return {"status": "User removed", "user_id": user_id}
 
 
-@router.post("/{community_id}/subscribe/", summary="Подписаться/отписаться от сообщества")
+@router.post(
+    "/{community_id}/subscribe/",
+    response_model=ToggleSubscription,
+    summary="Подписаться/отписаться от сообщества"
+)
 async def toggle_subscription(
         community_id: int,
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+
+    community = await community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == current_user.id
-    )
-    result = await session.execute(query)
-    membership = result.scalars().first()
+    membership = await community_membership_db_interface.fetch_one(session, community_id, current_user.id)
 
     if membership:
         await session.delete(membership)
         await session.commit()
         return {"status": "unsubscribed", "community_id": community_id}
-    # TODO убрать else
-    else:
-        new_membership = CommunityMembership(
-            user_id=current_user.id,
-            community_id=community_id,
-            role=CommunityRoleEnum.user
-        )
-        session.add(new_membership)
-        await session.commit()
-        return {"status": "subscribed", "community_id": community_id}
+
+    new_membership = CommunityMembership(
+        user_id=current_user.id,
+        community_id=community_id,
+        role=CommunityRoleEnum.user
+    )
+    session.add(new_membership)
+    await session.commit()
+    return {"status": "subscribed", "community_id": community_id}
 
 
 @router.post("/{community_id}/posts/", response_model=PostRead, status_code=201, summary="Добавить пост в сообщество")

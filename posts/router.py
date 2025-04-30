@@ -117,7 +117,7 @@ async def update_post(
     await session.commit()
     await session.refresh(existing_post)
 
-    return {"status": "Updated"}
+    return existing_post
 
 
 @router.delete("/delete/{post_id}/", summary="Удалить пост 💣")

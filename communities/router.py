@@ -2,17 +2,20 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from categories.models import Category
-from communities.community_db_interface import CommunityDBInterface, CommunityMembershipDBInterface
+from communities.community_db_interface import CommunityDBInterface, CommunityMembershipDBInterface, \
+    CommunityPostDBInterface
 from communities.models import Community, CommunityMembership, CommunityRoleEnum
 from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity, CommunityDelete, AssignModerator, \
     RemoveUser, ToggleSubscription
 from dependencies import current_user
 from posts.models import Post
-from posts.schemas import PostCreate, PostUpdate, PostRead
+from posts.post_db_interface import PostDBInterface
+from posts.schemas import PostCreate, PostUpdate, PostRead, PostDelete
 from settings import get_async_session
 
 router = APIRouter(
@@ -22,6 +25,8 @@ router = APIRouter(
 
 community_db_interface = CommunityDBInterface()
 community_membership_db_interface = CommunityMembershipDBInterface()
+community_post_db_interface = CommunityPostDBInterface()
+post_db_interface = PostDBInterface()
 
 @router.get("/all/", response_model=List[ReadCommunity], summary="Взять все сообщества")
 async def get_all_communities(session: AsyncSession = Depends(get_async_session)):
@@ -219,19 +224,12 @@ async def create_post_in_community(
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+    community = await community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == current_user.id
-    )
-    result = await session.execute(query)
-    membership = result.scalars().first()
+    membership = await community_membership_db_interface.fetch_one(session, community_id, current_user.id)
 
     if not membership:
         raise HTTPException(status_code=403, detail="Вы не состоите в этом сообществе")
@@ -251,8 +249,7 @@ async def create_post_in_community(
             result = await session.execute(select(Category).filter_by(name=cat_name))
             category_obj = result.scalar_one_or_none()
             categories_objects.append(category_obj)
-    # TODO подоюрать конкретный Exception
-    except Exception:
+    except NoResultFound:
         raise HTTPException(status_code=404, detail="Не найденно данной категории")
 
     if not categories_objects:
@@ -261,9 +258,10 @@ async def create_post_in_community(
 
     session.add(new_post)
     await session.commit()
-    await session.refresh(new_post)
 
-    return {"status": "Post created", "post_id": new_post.id}
+    new_post = await post_db_interface.fetch_one(session, new_post.id)
+
+    return new_post
 
 
 @router.get("/{community_id}/posts/", response_model=List[PostRead], summary="Получить все посты в сообществе")
@@ -271,16 +269,12 @@ async def get_all_posts_in_community(
         community_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+    community = community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    query = select(Post).where(Post.community_id == community_id).order_by(Post.created_at.desc())
-    result = await session.execute(query)
-    posts = result.scalars().all()
+    posts = await community_post_db_interface.fetch_all(session, community_id)
 
     return posts
 
@@ -291,19 +285,12 @@ async def get_post_in_community(
         post_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+    community = await community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    query = select(Post).where(
-        Post.id == post_id,
-        Post.community_id == community_id
-    )
-    result = await session.execute(query)
-    post = result.scalars().first()
+    post = await community_post_db_interface.fetch_one(session, post_id, community_id)
 
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
@@ -319,34 +306,21 @@ async def update_post_in_community(
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+    community = await community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == current_user.id
-    )
-    result = await session.execute(query)
-    membership = result.scalars().first()
+    membership = await community_membership_db_interface.fetch_one(session, community_id, current_user.id)
 
     if not membership or membership.role not in [CommunityRoleEnum.admin, CommunityRoleEnum.moderator]:
         raise HTTPException(status_code=403, detail="Нет прав для обновления постов в этом сообществе")
 
-    query = select(Post).where(
-        Post.id == post_id,
-        Post.community_id == community_id
-    )
-    result = await session.execute(query)
-    post = result.scalars().first()
+    post = await community_post_db_interface.fetch_one(session, post_id, community_id)
 
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
 
-    # Обновляем поля поста, если они предоставлены
     if post_update.title is not None:
         post.title = post_update.title
     if post_update.content is not None:
@@ -356,42 +330,27 @@ async def update_post_in_community(
     await session.commit()
     await session.refresh(post)
 
-    return {"status": "Post updated", "post_id": post.id}
+    return post
 
 
-@router.delete("/{community_id}/posts/{post_id}/", summary="Удалить пост в сообществе")
+@router.delete("/{community_id}/posts/{post_id}/", response_model=PostDelete, summary="Удалить пост в сообществе")
 async def delete_post_in_community(
         community_id: int,
         post_id: int,
         current_user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    # Проверяем существование сообщества
-    query = select(Community).where(Community.id == community_id)
-    result = await session.execute(query)
-    community = result.scalars().first()
+    community = await community_db_interface.fetch_one(session, community_id)
 
     if not community:
         raise HTTPException(status_code=404, detail="Сообщество не найдено")
 
-    # Проверяем, что пользователь состоит в сообществе с правами admin или moderator
-    query = select(CommunityMembership).where(
-        CommunityMembership.community_id == community_id,
-        CommunityMembership.user_id == current_user.id
-    )
-    result = await session.execute(query)
-    membership = result.scalars().first()
+    membership = await community_membership_db_interface.fetch_one(session, community_id, current_user.id)
 
     if not membership or membership.role not in [CommunityRoleEnum.admin, CommunityRoleEnum.moderator]:
         raise HTTPException(status_code=403, detail="Нет прав для удаления постов в этом сообществе")
 
-    # Проверяем, что пост существует и принадлежит сообществу
-    query = select(Post).where(
-        Post.id == post_id,
-        Post.community_id == community_id
-    )
-    result = await session.execute(query)
-    post = result.scalars().first()
+    post = await community_post_db_interface.fetch_one(session, post_id, community_id)
 
     if not post:
         raise HTTPException(status_code=404, detail="Пост не найден")
@@ -399,4 +358,4 @@ async def delete_post_in_community(
     await session.delete(post)
     await session.commit()
 
-    return {"status": "Post deleted", "post_id": post_id}
+    return {"status": "Post deleted", "id": post_id}

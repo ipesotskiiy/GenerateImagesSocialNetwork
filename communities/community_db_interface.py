@@ -1,7 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from communities.models import Community, CommunityMembership
+from posts.models import Post
 
 
 class CommunityDBInterface:
@@ -27,3 +29,26 @@ class CommunityMembershipDBInterface:
         result = await session.execute(query)
         current_membership = result.scalars().first()
         return current_membership
+
+
+class CommunityPostDBInterface:
+    async def fetch_all(self, session: AsyncSession, community_id: int):
+        query = select(Post).options(
+                selectinload(Post.categories),
+                selectinload(Post.likes),
+                selectinload(Post.dislikes)
+            ).where(Post.community_id == community_id).order_by(Post.created_at.desc())
+        result = await session.execute(query)
+        posts = result.scalars().all()
+        return posts
+
+    async def fetch_one(self, session: AsyncSession, post_id, community_id):
+        query = select(Post).options(
+                selectinload(Post.categories),
+                selectinload(Post.likes),
+                selectinload(Post.dislikes)
+            ).where(Post.id == post_id, Post.community_id == community_id)
+        result = await session.execute(query)
+        post = result.scalars().first()
+        return post
+

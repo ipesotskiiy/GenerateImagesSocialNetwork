@@ -7,8 +7,7 @@ from fastapi_users.password import PasswordHelper
 
 from auth.models import User
 from auth.utils import get_user_db
-
-SECRET = "SECRET"
+from settings import SECRET
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):

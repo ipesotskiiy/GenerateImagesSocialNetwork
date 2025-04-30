@@ -27,3 +27,8 @@ class CommentUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class CommentDelete(BaseModel):
+    status: str
+    id: int

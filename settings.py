@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base, sessionmaker
 from dotenv import load_dotenv
+from fastapi_users.authentication import BearerTransport
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,6 +44,10 @@ MEDIA_COMMENT_IMAGES_URL = os.path.join(MEDIA_URL, "comment_images")
 MEDIA_TEMP_COMMENT_IMAGES_URL = os.path.join(MEDIA_URL, "comment_images_tmp")
 MEDIA_POST_IMAGES_URL = os.path.join(MEDIA_URL, "post_images")
 MEDIA_TEMP_POST_IMAGES_URL = os.path.join(MEDIA_URL, "post_images_tmp")
+
+
+SECRET = "SECRET"
+bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

@@ -2,7 +2,14 @@ import os
 import shutil
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    UploadFile,
+    File,
+    status
+)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,7 +17,13 @@ from auth.user_db_interface import UserDBInterface
 from celery_main import celery_app
 from dependencies import current_user
 from auth.models import User
-from settings import get_async_session, MEDIA_TEMP_AVATAR_URL, MEDIA_AVATAR_URL, MEDIA_TEMP_USER_PHOTOS_URL, BASE_DIR
+from settings import (
+    get_async_session,
+    MEDIA_TEMP_AVATAR_URL,
+    MEDIA_AVATAR_URL,
+    MEDIA_TEMP_USER_PHOTOS_URL,
+    BASE_DIR
+)
 
 router = APIRouter(
     prefix="/subscriptions",

@@ -1,21 +1,45 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status
+)
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from categories.models import Category
-from communities.community_db_interface import CommunityDBInterface, CommunityMembershipDBInterface, \
+from communities.community_db_interface import (
+    CommunityDBInterface,
+    CommunityMembershipDBInterface,
     CommunityPostDBInterface
-from communities.models import Community, CommunityMembership, CommunityRoleEnum
-from communities.schemas import CreateCommunity, UpdateCommunity, ReadCommunity, CommunityDelete, AssignModerator, \
-    RemoveUser, ToggleSubscription
+)
+from communities.models import (
+    Community,
+    CommunityMembership,
+    CommunityRoleEnum
+)
+from communities.schemas import (
+    CreateCommunity,
+    UpdateCommunity,
+    ReadCommunity,
+    CommunityDelete,
+    AssignModerator,
+    RemoveUser,
+    ToggleSubscription
+)
 from dependencies import current_user
 from posts.models import Post
 from posts.post_db_interface import PostDBInterface
-from posts.schemas import PostCreate, PostUpdate, PostRead, PostDelete
+from posts.schemas import (
+    PostCreate,
+    PostUpdate,
+    PostRead,
+    PostDelete
+)
 from settings import get_async_session
 
 router = APIRouter(

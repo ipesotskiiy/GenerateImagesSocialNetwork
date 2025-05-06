@@ -1,9 +1,9 @@
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from posts.models import Post
+from posts.models import Post, PostImages
 
 
 class PostDBInterface:
@@ -27,3 +27,20 @@ class PostDBInterface:
         ).order_by(Post.id)
         result: Result = await session.execute(query)
         return result.scalars().all()
+
+
+class PostImagesDBInterface:
+    async def fetch_one(self, session: AsyncSession, image_id: int, post_id: int):
+        result = await session.execute(
+            select(PostImages).where(
+                PostImages.id == image_id,
+                PostImages.post_id == post_id
+            )
+        )
+        return result.scalars().first()
+
+    async def delete_one(self, session: AsyncSession, image_id: int):
+        await session.execute(delete(PostImages).where(PostImages.id == image_id))
+        await session.commit()
+
+

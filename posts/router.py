@@ -10,18 +10,17 @@ from fastapi import (
     UploadFile,
     File
 )
-from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from categories.category_db_interface import CategoryDBInterface
 from celery_main import celery_app
-from posts.models import Post, PostImages
-from posts.post_db_interface import PostDBInterface
+from posts.models import Post
+from posts.post_db_interface import PostDBInterface, PostImagesDBInterface
 from posts.schemas import (
     PostCreate,
     PostUpdate,
-    PostRead,
+    PostRead, PostImagesUpload,
 )
 from settings import (
     get_async_session,
@@ -42,6 +41,7 @@ router_post_images = APIRouter(
 )
 
 post_db_interface = PostDBInterface()
+post_images_db_interface = PostImagesDBInterface()
 category_db_interface = CategoryDBInterface()
 
 @router.get("/all/", response_model=List[PostRead], summary="Получить все посты")
@@ -135,6 +135,7 @@ async def delete_post(
 
 @router_post_images.post(
     "/upload_images/{post_id}/",
+    response_model=PostImagesUpload,
     summary="Прикрепить изображение к посту",
     status_code=status.HTTP_201_CREATED
 )
@@ -165,13 +166,7 @@ async def delete_post_images(
         image_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(
-        select(PostImages).where(
-            PostImages.id == image_id,
-            PostImages.post_id == post_id
-        )
-    )
-    image = result.scalars().first()
+    image = await post_images_db_interface.fetch_one(session, image_id, post_id)
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
 
@@ -181,8 +176,7 @@ async def delete_post_images(
     if image.thumbnail_url:
         raw_paths.append(image.thumbnail_url)
 
-    await session.execute(delete(PostImages).where(PostImages.id==image_id))
-    await session.commit()
+    await post_images_db_interface.delete_one(session, image_id)
 
     for p in raw_paths:
         if os.path.isabs(p):
@@ -194,5 +188,6 @@ async def delete_post_images(
                 "celery_tasks.delete_post_image",
                 args=[full_path]
             )
+
     return
 

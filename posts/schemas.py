@@ -44,3 +44,7 @@ class PostDelete(BaseModel):
     status: str
     id: int
 
+class PostImagesUpload(BaseModel):
+    status: str
+    count: int
+

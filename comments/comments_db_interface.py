@@ -32,8 +32,7 @@ class CommentImagesDBInterface:
                 CommentImages.comment_id == comment_id
             )
         )
-        image = result.scalars().first()
-        return image
+        return result.scalars().first()
 
     async def delete_one(self, session: AsyncSession, image_id: int):
         await session.execute(delete(CommentImages).where(CommentImages.id == image_id))

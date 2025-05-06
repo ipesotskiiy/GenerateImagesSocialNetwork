@@ -10,6 +10,5 @@ class ReactionDBInterface:
                 Model.content_type == reaction_data.content_type
             )
         )
-        existing_reaction = reaction.scalars().first()
-        return existing_reaction
+        return reaction.scalars().first()
 

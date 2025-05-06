@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -7,7 +8,7 @@ from posts.models import Post
 
 class PostDBInterface:
     async def fetch_one(self, session: AsyncSession,  post_id: int):
-        result = await session.execute(
+        post = await session.execute(
             select(Post)
             .options(
                 selectinload(Post.categories),
@@ -16,5 +17,13 @@ class PostDBInterface:
             )
             .where(Post.id == post_id)
         )
-        new_post = result.scalars().first()
-        return new_post
+        return post.scalars().first()
+
+    async def fetch_all(self, session: AsyncSession):
+        query = select(Post).options(
+            selectinload(Post.categories),
+            selectinload(Post.likes),
+            selectinload(Post.dislikes)
+        ).order_by(Post.id)
+        result: Result = await session.execute(query)
+        return result.scalars().all()

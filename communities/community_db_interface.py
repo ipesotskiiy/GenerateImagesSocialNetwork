@@ -10,14 +10,12 @@ class CommunityDBInterface:
     async def fetch_all(self, session: AsyncSession):
         query = select(Community).order_by(Community.id)
         result = await session.execute(query)
-        communities = result.scalars().all()
-        return communities
+        return result.scalars().all()
 
     async def fetch_one(self, session: AsyncSession, community_id: int):
         query = select(Community).where(Community.id == community_id)
         result = await session.execute(query)
-        community = result.scalars().first()
-        return community
+        return result.scalars().first()
 
 
 class CommunityMembershipDBInterface:
@@ -27,8 +25,7 @@ class CommunityMembershipDBInterface:
             CommunityMembership.user_id == user_id
         )
         result = await session.execute(query)
-        current_membership = result.scalars().first()
-        return current_membership
+        return result.scalars().first()
 
 
 class CommunityPostDBInterface:
@@ -39,8 +36,7 @@ class CommunityPostDBInterface:
                 selectinload(Post.dislikes)
             ).where(Post.community_id == community_id).order_by(Post.created_at.desc())
         result = await session.execute(query)
-        posts = result.scalars().all()
-        return posts
+        return result.scalars().all()
 
     async def fetch_one(self, session: AsyncSession, post_id, community_id):
         query = select(Post).options(
@@ -49,6 +45,5 @@ class CommunityPostDBInterface:
                 selectinload(Post.dislikes)
             ).where(Post.id == post_id, Post.community_id == community_id)
         result = await session.execute(query)
-        post = result.scalars().first()
-        return post
+        return result.scalars().first()
 

@@ -2,18 +2,32 @@ import os
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File
+)
 from sqlalchemy import select, delete
-from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from auth.models import User
-from categories.models import Category
+from categories.category_db_interface import CategoryDBInterface
 from celery_main import celery_app
 from posts.models import Post, PostImages
-from posts.schemas import PostCreate, PostUpdate, PostRead
-from settings import get_async_session, MEDIA_TEMP_POST_IMAGES_URL, BASE_DIR
+from posts.post_db_interface import PostDBInterface
+from posts.schemas import (
+    PostCreate,
+    PostUpdate,
+    PostRead,
+)
+from settings import (
+    get_async_session,
+    MEDIA_TEMP_POST_IMAGES_URL,
+    BASE_DIR
+)
 from dependencies import current_user
 
 router = APIRouter(
@@ -27,29 +41,18 @@ router_post_images = APIRouter(
     tags=["Posts Images 📸"]
 )
 
+post_db_interface = PostDBInterface()
+category_db_interface = CategoryDBInterface()
 
 @router.get("/all/", response_model=List[PostRead], summary="Получить все посты")
 async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).options(
-        selectinload(Post.categories),
-        selectinload(Post.likes),
-        selectinload(Post.dislikes)
-    ).order_by(Post.id)
-    result: Result = await session.execute(query)
 
-    return result.scalars().all()
+    return await post_db_interface.fetch_all(session)
 
 
 @router.get('/{post_id}/', response_model=PostRead, summary="Получить пост")
 async def get_post(post_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Post).where(Post.id == post_id).options(
-        selectinload(Post.categories),
-        selectinload(Post.likes),
-        selectinload(Post.dislikes)
-    )
-    result: Result = await session.execute(query)
-
-    post = result.scalars().first()
+    post = await post_db_interface.fetch_one(session, post_id)
 
     if not post:
         raise HTTPException(status_code=404, detail="Запись не найдена")
@@ -62,21 +65,12 @@ async def add_post(new_post: PostCreate, session: AsyncSession = Depends(get_asy
     post_data = new_post.dict(exclude={"categories"})
     post = Post(**post_data)
 
-    categories_objects = []
-
-    for cat_name in new_post.categories:
-        result = await session.execute(select(Category).filter_by(name=cat_name))
-        category_obj = result.scalar_one_or_none()
-
-        categories_objects.append(category_obj)
-
-    post.categories = categories_objects
-
     session.add(post)
     await session.commit()
-    await session.refresh(post)
 
-    return {"status": "Created", "id": post.id}
+    post = await post_db_interface.fetch_one(session, post.id)
+
+    return post
 
 
 @router.patch("/update/{post_id}/", response_model=PostRead, summary="Обновить пост")
@@ -86,9 +80,7 @@ async def update_post(
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(current_user)
 ):
-    query = select(Post).where(Post.id == post_id).options(selectinload(Post.categories))
-    result: Result = await session.execute(query)
-    existing_post = result.scalars().first()
+    existing_post = await post_db_interface.fetch_one(session, post_id)
 
     if not existing_post:
         raise HTTPException(status_code=404, detail="Запись не найдена.")
@@ -108,9 +100,7 @@ async def update_post(
         existing_post.content = update_data["content"]
 
     if "categories" in update_data:
-        category_query = select(Category).where(Category.name.in_(update_data["categories"]))
-        category_result = await session.execute(category_query)
-        categories = category_result.scalars().all()
+        categories = await category_db_interface.fetch_all(session, update_data)
         existing_post.categories = categories
 
     session.add(existing_post)
@@ -120,15 +110,13 @@ async def update_post(
     return existing_post
 
 
-@router.delete("/delete/{post_id}/", summary="Удалить пост 💣")
+@router.delete("/delete/{post_id}/", summary="Удалить пост", status_code=204)
 async def delete_post(
         post_id: int,
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(current_user)
 ):
-    query = select(Post).where(Post.id == post_id)
-    result: Result = await session.execute(query)
-    existing_post = result.scalars().first()
+    existing_post = await post_db_interface.fetch_one(session, post_id)
 
     if not existing_post:
         raise HTTPException(status_code=404, detail="Запись не найдена")

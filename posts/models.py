@@ -81,11 +81,3 @@ class Post(Base):
         back_populates="post",
         cascade="all, delete-orphan"
     )
-
-    # @property
-    # def likes_count(self):
-    #     return len(self.likes) if self.likes else 0
-    #
-    # @property
-    # def dislikes_count(self):
-    #     return len(self.dislikes) if self.dislikes else 0

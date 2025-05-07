@@ -1,10 +1,10 @@
 from fastapi_users.authentication import AuthenticationBackend, JWTStrategy
 
-from settings import SECRET, bearer_transport
+from settings import settings, bearer_transport
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+    return JWTStrategy(secret=settings.SECRET, lifetime_seconds=3600)
 
 
 auth_backend = AuthenticationBackend(

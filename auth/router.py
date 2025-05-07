@@ -19,10 +19,7 @@ from dependencies import current_user
 from auth.models import User
 from settings import (
     get_async_session,
-    MEDIA_TEMP_AVATAR_URL,
-    MEDIA_AVATAR_URL,
-    MEDIA_TEMP_USER_PHOTOS_URL,
-    BASE_DIR
+    settings
 )
 
 router = APIRouter(
@@ -63,24 +60,24 @@ async def toggle_follow_user(
 
 @router_user_images.post("/user/{user_id}/avatar/", summary="Установить пользователю аватар")
 async def upload_avatar(user_id: int, file: UploadFile = File(...)):
-    temp_path = f"{MEDIA_TEMP_AVATAR_URL}/{uuid.uuid4()}_{file.filename}"
+    temp_path = f"{settings.media_temp_avatar_dir}/{uuid.uuid4()}_{file.filename}"
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     celery_app.send_task(
         "celery_tasks.process_avatar.process_avatar",
-        args=[user_id, temp_path, MEDIA_AVATAR_URL]
+        args=[user_id, temp_path, settings.media_avatar_dir]
     )
     return {"status": "processing"}
 
 
 @router_user_images.post("/users/{user_id}/photos/", summary="Добавить фотаграфии", status_code=status.HTTP_201_CREATED)
 async def upload_photos(user_id: int, files: list[UploadFile] = File(...)):
-    os.makedirs(MEDIA_TEMP_USER_PHOTOS_URL, exist_ok=True)
+    os.makedirs(settings.media_temp_user_photos_dir, exist_ok=True)
 
     for file in files:
         tmp_name = f"{uuid.uuid4()}_{file.filename}"
-        tmp_path = os.path.join(MEDIA_TEMP_USER_PHOTOS_URL, tmp_name)
+        tmp_path = os.path.join(settings.media_temp_user_photos_dir, tmp_name)
 
         # Сохраняем во временное хранилище
         with open(tmp_path, "wb") as buf:
@@ -122,7 +119,7 @@ async def delete_photos(
             full_path = p
         else:
             rel = p.lstrip("/")
-            full_path = os.path.join(BASE_DIR, rel)
+            full_path = os.path.join(settings.base_dir, rel)
         celery_app.send_task(
             "celery_tasks.delete_media.delete_media",
             args=[full_path]

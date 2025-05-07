@@ -4,17 +4,17 @@ from PIL import Image
 from celery import shared_task
 
 from posts.models import PostImages
-from settings import MEDIA_POST_IMAGES_URL, sync_session
+from settings import settings, sync_session
 
 
 @shared_task(name="celery_tasks.upload_post_image.upload_post_image")
 def upload_post_image(post_id: int, temp_path: str):
-    os.makedirs(MEDIA_POST_IMAGES_URL, exist_ok=True)
-    thumb_dir = os.path.join(MEDIA_POST_IMAGES_URL, "thumbnails")
+    os.makedirs(settings.media_post_images_dir, exist_ok=True)
+    thumb_dir = os.path.join(settings.media_post_images_dir, "thumbnails")
     os.makedirs(thumb_dir, exist_ok=True)
 
     filename = os.path.basename(temp_path)
-    final_path = os.path.join(MEDIA_POST_IMAGES_URL, filename)
+    final_path = os.path.join(settings.media_post_images_dir, filename)
     thumbnail_path = os.path.join(thumb_dir, filename)
 
     with Image.open(temp_path) as img:

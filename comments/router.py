@@ -24,8 +24,7 @@ from comments.schemas import (
 )
 from settings import (
     get_async_session,
-    MEDIA_TEMP_COMMENT_IMAGES_URL,
-    BASE_DIR
+    settings
 )
 from dependencies import current_user
 
@@ -124,11 +123,11 @@ async def delete_comment(
     status_code=status.HTTP_201_CREATED
 )
 async def upload_images(comment_id: int, files: list[UploadFile] = File(...)):
-    os.makedirs(MEDIA_TEMP_COMMENT_IMAGES_URL, exist_ok=True)
+    os.makedirs(settings.media_temp_comment_images_dir, exist_ok=True)
 
     for file in files:
          tmp_name = f"{uuid.uuid4()}_{file.filename}"
-         tmp_path = os.path.join(MEDIA_TEMP_COMMENT_IMAGES_URL, tmp_name)
+         tmp_path = os.path.join(settings.media_temp_comment_images_dir, tmp_name)
 
          with open(tmp_path, "wb") as buf:
              buf.write(await file.read())
@@ -167,7 +166,7 @@ async def delete_comment_images(
             full_path = p
         else:
             rel = p.lstrip("/")
-            full_path = os.path.join(BASE_DIR, rel)
+            full_path = os.path.join(settings.base_dir, rel)
         celery_app.send_task(
             "celery_tasks.delete_comment_image",
             args=[full_path]

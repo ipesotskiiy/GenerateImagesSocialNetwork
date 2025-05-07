@@ -1,13 +1,13 @@
 from celery import Celery
 from celery.schedules import crontab
 
-from settings import redis_url
+from settings import settings
 
-print(redis_url)
+print(settings.REDIS_URL)
 celery_app = Celery(
     'celery_worker',
-    broker=redis_url,
-    backend=redis_url
+    broker=settings.REDIS_URL,
+    backend=settings.REDIS_URL
 )
 
 

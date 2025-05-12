@@ -2,8 +2,10 @@ import os
 
 from celery import shared_task
 
-from settings import settings
+from settings import get_settings
 
+
+settings = get_settings()
 
 @shared_task(name="celery_tasks.cleanup_temp_media")
 def cleanup_temp_media():

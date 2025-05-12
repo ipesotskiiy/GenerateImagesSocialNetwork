@@ -4,8 +4,10 @@ from PIL import Image
 from celery import shared_task
 
 from comments.models import CommentImages
-from settings import settings, sync_session
+from settings import get_settings, get_sync_sessionmaker
 
+
+settings = get_settings()
 
 @shared_task(name="celery_tasks.upload_comment_image.upload_comment_image")
 def upload_comment_image(comment_id: int, temp_path: str):
@@ -31,7 +33,7 @@ def upload_comment_image(comment_id: int, temp_path: str):
     except FileNotFoundError as e:
         print(f"Exception in upload comment image process: {e}")
 
-    db = sync_session()
+    db = get_sync_sessionmaker()
     try:
         comment_image = CommentImages(
             comment_id=comment_id,

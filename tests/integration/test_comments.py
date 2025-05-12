@@ -47,7 +47,7 @@ async def test_update_comment(authenticated_client, db_session, first_comment):
     response = await authenticated_client.patch(f'/comments/update/{first_comment.id}/', json=payload)
     assert response.status_code == 200
 
-    comment_data = response.json()['comment_data']
+    comment_data = response.json()
     assert 'id' in comment_data
     assert comment_data["text"] == "Updated first test comment text"
 

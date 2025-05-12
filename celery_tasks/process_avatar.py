@@ -5,8 +5,9 @@ from sqlalchemy import update
 
 from auth.models import User
 
-from settings import sync_session
+from settings import get_settings
 
+settings = get_settings()
 
 @shared_task(name="celery_tasks.process_avatar.process_avatar")
 def process_avatar(user_id: int, input_path: str, output_dir: str):
@@ -26,7 +27,7 @@ def process_avatar(user_id: int, input_path: str, output_dir: str):
 
     avatar_url = f"{output_path}"
 
-    db = sync_session()
+    db = settings.sync_session()
     db.execute(
         update(User).where(User.id==user_id).values(avatar_url=avatar_url)
     )

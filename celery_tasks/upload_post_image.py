@@ -4,8 +4,10 @@ from PIL import Image
 from celery import shared_task
 
 from posts.models import PostImages
-from settings import settings, sync_session
+from settings import get_settings
 
+
+settings = get_settings()
 
 @shared_task(name="celery_tasks.upload_post_image.upload_post_image")
 def upload_post_image(post_id: int, temp_path: str):

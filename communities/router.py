@@ -67,7 +67,7 @@ async def get_community(community_id: int, session: AsyncSession = Depends(get_a
     return community
 
 
-@router.post("/create/", response_model=CreateCommunity, summary="Создать сообщество", status_code=201)
+@router.post("/create/", response_model=ReadCommunity, summary="Создать сообщество", status_code=201)
 async def create_community(
     data_for_new_community: CreateCommunity,
     current_user: User = Depends(current_user),
@@ -352,9 +352,9 @@ async def update_post_in_community(
 
     session.add(post)
     await session.commit()
-    await session.refresh(post)
+    updated_post = await community_post_db_interface.fetch_one(session, post_id, community_id)
 
-    return post
+    return updated_post
 
 
 @router.delete("/{community_id}/posts/{post_id}/", response_model=PostDelete, summary="Удалить пост в сообществе")

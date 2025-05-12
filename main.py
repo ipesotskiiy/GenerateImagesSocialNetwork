@@ -9,7 +9,7 @@ from dependencies import fastapi_users
 from logging_config import Logger
 from posts.router import router as router_posts, router_post_images
 from comments.router import router as router_comments, router_comment_images
-from settings import async_session_maker
+from settings import get_async_session, get_async_sessionmaker
 from startup import create_seed_categories
 from like_dislike.router import like_router as router_like, dislike_router as router_dislike
 from communities.router import router as router_community
@@ -55,9 +55,9 @@ app.include_router(router_community)
 app.include_router(router_subscriptions)
 
 @app.on_event("startup")
-async def on_startup():
-
-    async with async_session_maker() as session:
+async def on_startup() -> None:
+    session_maker = get_async_sessionmaker()
+    async with session_maker() as session:
         await create_seed_categories(session)
 
 

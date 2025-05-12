@@ -58,14 +58,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_superuser = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
-    age = Column(
-        Integer,
-        Computed(
-            "DATE_PART('year', AGE(CURRENT_DATE, date_of_birth))",
-            persisted=True
-        ),
-        nullable=True
-    )
 
     posts = relationship("Post", back_populates="author", cascade="all, delete-orphan")
     comments = relationship("Comment", back_populates="author", cascade="all, delete-orphan")

@@ -9,7 +9,6 @@ class UserRead(schemas.BaseUser[int]):
     email: str
     username: str
     date_of_birth: Optional[date]
-    age: Optional[int]
     bio: Optional[str]
     is_active: bool = True
     is_superuser: bool = False

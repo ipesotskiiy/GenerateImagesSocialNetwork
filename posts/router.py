@@ -24,7 +24,7 @@ from posts.schemas import (
 )
 from settings import (
     get_async_session,
-    settings
+    get_settings
 )
 from dependencies import current_user
 
@@ -42,6 +42,7 @@ router_post_images = APIRouter(
 post_db_interface = PostDBInterface()
 post_images_db_interface = PostImagesDBInterface()
 category_db_interface = CategoryDBInterface()
+settings = get_settings()
 
 @router.get("/all/", response_model=List[PostRead], summary="Получить все посты")
 async def get_all_posts(session: AsyncSession = Depends(get_async_session)):
@@ -104,9 +105,9 @@ async def update_post(
 
     session.add(existing_post)
     await session.commit()
-    await session.refresh(existing_post)
-
-    return existing_post
+    updated_post = await post_db_interface.fetch_one(session, post_id)
+GI
+    return updated_post
 
 
 @router.delete("/delete/{post_id}/", summary="Удалить пост", status_code=204)

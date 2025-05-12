@@ -2,8 +2,10 @@ import os
 
 from celery import shared_task
 
-from settings import settings
+from settings import get_settings
 
+
+settings = get_settings()
 
 @shared_task(name="celery_tasks.delete_post_image")
 def delete_post_image(path: str):

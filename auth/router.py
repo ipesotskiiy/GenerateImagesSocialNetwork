@@ -13,13 +13,13 @@ from fastapi import (
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.user_db_interface import UserDBInterface
+from auth.user_db_interface import UserDBInterface, UserInterface
 from celery_main import celery_app
 from dependencies import current_user
 from auth.models import User
 from settings import (
     get_async_session,
-    settings
+    get_settings
 )
 
 router = APIRouter(
@@ -33,6 +33,8 @@ router_user_images = APIRouter(
 )
 
 user_db_interface = UserDBInterface()
+user_interface = UserInterface()
+settings = get_settings()
 
 @router.post("/follow/{user_id}", summary="Подписаться/Отписаться от пользователя")
 async def toggle_follow_user(
@@ -42,9 +44,7 @@ async def toggle_follow_user(
 ):
     await session.refresh(current_user, attribute_names=["following"])
 
-    user = select(User).where(User.id == user_id)
-    result = await session.execute(user)
-    user_to_follow = result.scalars().first()
+    user_to_follow = await user_interface.fetch_one(session, user_id)
 
     if not user_to_follow:
         raise HTTPException(status_code=404, detail="Пользователь не найден")

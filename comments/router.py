@@ -24,7 +24,7 @@ from comments.schemas import (
 )
 from settings import (
     get_async_session,
-    settings
+    get_settings
 )
 from dependencies import current_user
 
@@ -40,6 +40,7 @@ router_comment_images = APIRouter(
 
 comment_db_interface = CommentsDBInterface()
 comment_image_db_interface = CommentImagesDBInterface()
+settings = get_settings()
 
 @router.get("/all/", response_model=List[CommentRead], summary="Взять все комментарии")
 async def get_all_comments(session: AsyncSession = Depends(get_async_session)):
@@ -90,7 +91,7 @@ async def update_comment(
     session.add(comment)
 
     await session.commit()
-    await session.refresh(comment)
+    # await session.refresh(comment)
 
     return comment
 

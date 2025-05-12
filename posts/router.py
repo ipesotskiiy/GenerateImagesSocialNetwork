@@ -106,7 +106,7 @@ async def update_post(
     session.add(existing_post)
     await session.commit()
     updated_post = await post_db_interface.fetch_one(session, post_id)
-GI
+
     return updated_post
 
 

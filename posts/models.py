@@ -1,5 +1,16 @@
 import datetime
-from sqlalchemy import MetaData, Column, Integer, String, DateTime, ForeignKey, func, Table, and_, TIMESTAMP
+from sqlalchemy import (
+    MetaData,
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey,
+    func,
+    Table,
+    and_,
+    TIMESTAMP
+)
 from sqlalchemy.orm import relationship, foreign
 
 from like_dislike.models import Like, Dislike
@@ -39,6 +50,8 @@ class Post(Base):
     content = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=True)
+    likes_count = Column(Integer, default=0, nullable=False)
+    dislikes_count = Column(Integer, default=0, nullable=False)
 
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     community_id = Column(Integer, ForeignKey("community.id"), nullable=True)
@@ -68,11 +81,3 @@ class Post(Base):
         back_populates="post",
         cascade="all, delete-orphan"
     )
-
-    @property
-    def likes_count(self):
-        return len(self.likes) if self.likes else 0
-
-    @property
-    def dislikes_count(self):
-        return len(self.dislikes) if self.dislikes else 0

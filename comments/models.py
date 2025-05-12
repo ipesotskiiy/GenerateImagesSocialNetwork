@@ -1,6 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, func, ForeignKey, and_, TIMESTAMP
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    func,
+    ForeignKey,
+    and_,
+    TIMESTAMP
+)
 from sqlalchemy.orm import relationship, foreign
 
 from like_dislike.models import Like, Dislike

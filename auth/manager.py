@@ -7,13 +7,14 @@ from fastapi_users.password import PasswordHelper
 
 from auth.models import User
 from auth.utils import get_user_db
+from settings import get_settings
 
-SECRET = "SECRET"
 
+settings = get_settings()
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
-    reset_password_token_secret = SECRET
-    verification_token_secret = SECRET
+    reset_password_token_secret = settings.secret
+    verification_token_secret = settings.secret
 
     def __init__(self, user_db):
         super().__init__(user_db)

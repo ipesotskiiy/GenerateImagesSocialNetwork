@@ -38,3 +38,13 @@ class PostUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class PostDelete(BaseModel):
+    status: str
+    id: int
+
+class PostImagesUpload(BaseModel):
+    status: str
+    count: int
+

@@ -2,17 +2,30 @@ import os
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from sqlalchemy import select, insert, delete
-from sqlalchemy.engine import Result
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File
+)
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from auth.models import User
 from celery_main import celery_app
-from comments.models import Comment, CommentImages
-from comments.schemas import CommentCreate, CommentUpdate, CommentRead
-from settings import get_async_session, MEDIA_TEMP_COMMENT_IMAGES_URL, BASE_DIR
+from comments.comments_db_interface import CommentsDBInterface, CommentImagesDBInterface
+from comments.models import Comment
+from comments.schemas import (
+    CommentCreate,
+    CommentUpdate,
+    CommentRead,
+    CommentDelete
+)
+from settings import (
+    get_async_session,
+    get_settings
+)
 from dependencies import current_user
 
 router = APIRouter(
@@ -25,30 +38,19 @@ router_comment_images = APIRouter(
     tags=["Comments Images 🌄"]
 )
 
-
-# TODO сделать return через pydantic
-
+comment_db_interface = CommentsDBInterface()
+comment_image_db_interface = CommentImagesDBInterface()
+settings = get_settings()
 
 @router.get("/all/", response_model=List[CommentRead], summary="Взять все комментарии")
 async def get_all_comments(session: AsyncSession = Depends(get_async_session)):
-    query = select(Comment).options(
-        selectinload(Comment.likes),
-        selectinload(Comment.dislikes)
-    ).order_by(Comment.id)
-    result: Result = await session.execute(query)
-    comments = result.scalars().all()
-
+    comments = await comment_db_interface.fetch_all(session)
     return comments
 
 
 @router.get('/{comment_id}/', response_model=CommentRead, summary="Взять комментарий")
 async def get_comment(comment_id: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(Comment).options(
-        selectinload(Comment.likes),
-        selectinload(Comment.dislikes)
-    ).where(Comment.id == comment_id)
-    result: Result = await session.execute(query)
-    comment = result.scalars().first()
+    comment = await comment_db_interface.fetch_one(session, comment_id)
 
     if not comment:
         raise HTTPException(status_code=404, detail="Коммент не найдена")
@@ -56,69 +58,62 @@ async def get_comment(comment_id: int, session: AsyncSession = Depends(get_async
     return comment
 
 
-@router.post('/create/', summary="Создать комментарий", status_code=201)
+@router.post('/create/', response_model=CommentRead, summary="Создать комментарий", status_code=201)
 async def add_comment(new_comment: CommentCreate, session: AsyncSession = Depends(get_async_session)):
-    stmt = insert(Comment).values(**new_comment.dict()).returning(Comment.id)
-
-    result = await session.execute(stmt)
+    comment = Comment(**new_comment.dict())
+    session.add(comment)
     await session.commit()
 
-    created_id = result.scalar_one()
-    return {"status": "Created", "id": created_id}
+    comment = await comment_db_interface.fetch_one(session, comment.id)
+    return comment
 
 
-@router.patch("/update/{comment_id}/", summary="Обновить комментарий")
+@router.patch("/update/{comment_id}/", response_model=CommentRead, summary="Обновить комментарий")
 async def update_comment(
         comment_id: int,
         comment_data: CommentUpdate,
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(current_user)
 ):
-    query = select(Comment).where(Comment.id == comment_id)
-    result: Result = await session.execute(query)
-    existing_comment = result.scalars().first()
+    comment = await comment_db_interface.fetch_one(session, comment_id)
 
-    if not existing_comment:
+    if not comment:
         raise HTTPException(status_code=404, detail="Комментарий не найден.")
 
-    if existing_comment.user_id != current_user.id:
+    if comment.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Только автор может редактировать комментарий."
         )
 
-    # Обновление текста комментария
-    existing_comment.text = comment_data.text
+    comment.text = comment_data.text
 
-    # Сохранение изменений
-    session.add(existing_comment)
+    session.add(comment)
 
     await session.commit()
-    await session.refresh(existing_comment)
+    # await session.refresh(comment)
 
-    return {"status": "Updated", "comment_data": existing_comment}
+    return comment
 
 
-@router.delete("/delete/{comment_id}/", summary="Удалить комментарий")
+@router.delete("/delete/{comment_id}/", response_model=CommentDelete, summary="Удалить комментарий")
 async def delete_comment(
         comment_id: int,
         session: AsyncSession = Depends(get_async_session),
         current_user: User = Depends(current_user)
 ):
-    query = select(Comment).where(Comment.id == comment_id)
-    result: Result = await session.execute(query)
-    existing_comment = result.scalars().first()
+    comment = await comment_db_interface.fetch_one(session, comment_id)
 
-    if not existing_comment:
+    if not comment:
         raise HTTPException(status_code=404, detail="Комментарий не найден")
 
-    if existing_comment.user_id != current_user.id:
+    if comment.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Только автор можеть удалить комментарий."
         )
 
-    await session.delete(existing_comment)
+    await session.delete(comment)
     await session.commit()
 
     return {"status": "Deleted", "id": comment_id}
@@ -129,11 +124,11 @@ async def delete_comment(
     status_code=status.HTTP_201_CREATED
 )
 async def upload_images(comment_id: int, files: list[UploadFile] = File(...)):
-    os.makedirs(MEDIA_TEMP_COMMENT_IMAGES_URL, exist_ok=True)
+    os.makedirs(settings.media_temp_comment_images_dir, exist_ok=True)
 
     for file in files:
          tmp_name = f"{uuid.uuid4()}_{file.filename}"
-         tmp_path = os.path.join(MEDIA_TEMP_COMMENT_IMAGES_URL, tmp_name)
+         tmp_path = os.path.join(settings.media_temp_comment_images_dir, tmp_name)
 
          with open(tmp_path, "wb") as buf:
              buf.write(await file.read())
@@ -155,13 +150,7 @@ async def delete_comment_images(
         image_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(
-        select(CommentImages).where(
-            CommentImages.id == image_id,
-            CommentImages.comment_id == comment_id
-        )
-    )
-    image = result.scalars().first()
+    image = await comment_image_db_interface.fetch_one(session, comment_id, image_id)
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
 
@@ -171,15 +160,14 @@ async def delete_comment_images(
     if image.thumbnail_url:
         raw_paths.append(image.thumbnail_url)
 
-    await session.execute(delete(CommentImages).where(CommentImages.id==image_id))
-    await session.commit()
+    await comment_image_db_interface.delete_one(session, image_id)
 
     for p in raw_paths:
         if os.path.isabs(p):
             full_path = p
         else:
             rel = p.lstrip("/")
-            full_path = os.path.join(BASE_DIR, rel)
+            full_path = os.path.join(settings.base_dir, rel)
         celery_app.send_task(
             "celery_tasks.delete_comment_image",
             args=[full_path]

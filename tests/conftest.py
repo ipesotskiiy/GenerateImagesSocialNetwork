@@ -1,3 +1,13 @@
+import os
+
+os.environ.setdefault("DB_HOST", "dummy")
+os.environ.setdefault("DB_PORT", "5432")
+os.environ.setdefault("DB_NAME", "dummy")
+os.environ.setdefault("DB_USER", "dummy")
+os.environ.setdefault("DB_PASSWORD", "dummy")
+os.environ.setdefault("REDIS_URL", "redis://localhost:6379/1")
+os.environ.setdefault("SECRET", "test_secret")
+
 import pytest_asyncio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
@@ -334,9 +344,9 @@ async def first_community(authenticated_client, db_session):
     assert response.status_code == 201
 
     data = response.json()
-    assert "community_id" in data
+    assert "id" in data
 
-    community_in_db = await db_session.get(Community, data["community_id"])
+    community_in_db = await db_session.get(Community, data["id"])
     assert community_in_db is not None
 
     assert community_in_db.creator_id == authenticated_client.current_user.id
@@ -358,9 +368,9 @@ async def second_community(authenticated_client, db_session):
     assert response.status_code == 201
 
     data = response.json()
-    assert "community_id" in data
+    assert "id" in data
 
-    community_in_db = await db_session.get(Community, data["community_id"])
+    community_in_db = await db_session.get(Community, data["id"])
     assert community_in_db is not None
 
     assert community_in_db.creator_id == authenticated_client.current_user.id
@@ -387,9 +397,9 @@ async def first_post_in_community(authenticated_client, db_session, first_user, 
 
     data = response.json()
 
-    assert "post_id" in data
+    assert "id" in data
 
-    post_in_db = await db_session.get(Post, data["post_id"])
+    post_in_db = await db_session.get(Post, data["id"])
     assert post_in_db is not None
     yield post_in_db
 
@@ -410,8 +420,8 @@ async def second_post_in_community(authenticated_client, db_session, first_user,
 
     data = response.json()
 
-    assert "post_id" in data
+    assert "id" in data
 
-    post_in_db = await db_session.get(Post, data["post_id"])
+    post_in_db = await db_session.get(Post, data["id"])
     assert post_in_db is not None
     yield post_in_db

@@ -2,8 +2,10 @@ import os
 
 from celery import shared_task
 
-from settings import MEDIA_URL
+from settings import get_settings
 
+
+settings = get_settings()
 
 @shared_task(name="celery_tasks.cleanup_temp_media")
 def cleanup_temp_media():
@@ -13,11 +15,11 @@ def cleanup_temp_media():
     и удаляет из них все файлы.
     """
     deleted = []
-    for name in os.listdir(MEDIA_URL):
+    for name in os.listdir(settings.media_dir):
         if not name.endswith("_tmp"):
             continue
 
-        tmp_dir = os.path.join(MEDIA_URL, name)
+        tmp_dir = os.path.join(settings.media_dir, name)
         if not os.path.isdir(tmp_dir):
             continue
 

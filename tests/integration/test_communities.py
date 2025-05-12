@@ -15,9 +15,9 @@ async def test_create_community(authenticated_client, db_session):
     assert response.status_code == 201
 
     data = response.json()
-    assert "community_id" in data
+    assert "id" in data
 
-    community_in_db = await db_session.get(Community, data["community_id"])
+    community_in_db = await db_session.get(Community, data["id"])
     assert community_in_db is not None
 
     assert community_in_db.creator_id == authenticated_client.current_user.id
@@ -84,9 +84,9 @@ async def test_create_post_in_community(authenticated_client, db_session, first_
 
     data = response.json()
 
-    assert "post_id" in data
+    assert "id" in data
 
-    post_in_db = await db_session.get(Post, data["post_id"])
+    post_in_db = await db_session.get(Post, data["id"])
     assert post_in_db is not None
 
 
@@ -106,9 +106,9 @@ async def test_create_post_in_community(authenticated_client, db_session, first_
 
     data = response.json()
 
-    assert "post_id" in data
+    assert "id" in data
 
-    post_in_db = await db_session.get(Post, data["post_id"])
+    post_in_db = await db_session.get(Post, data["id"])
     assert post_in_db is not None
 
 
@@ -153,7 +153,7 @@ async def test_update_community_post(
     assert response.status_code == 200
 
     data = response.json()
-    post = await db_session.get(Post, data["post_id"])
+    post = await db_session.get(Post, data["id"])
     assert post.title == "Updated second test post in community"
     assert post.content == "Second test post in community content"
 

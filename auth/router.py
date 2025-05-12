@@ -2,14 +2,25 @@ import os
 import shutil
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, status
-from sqlalchemy import select, delete
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    UploadFile,
+    File,
+    status
+)
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from auth.user_db_interface import UserDBInterface, UserInterface
 from celery_main import celery_app
 from dependencies import current_user
-from auth.models import User, UserGallery
-from settings import get_async_session, MEDIA_TEMP_AVATAR_URL, MEDIA_AVATAR_URL, MEDIA_TEMP_USER_PHOTOS_URL, BASE_DIR
+from auth.models import User
+from settings import (
+    get_async_session,
+    get_settings
+)
 
 router = APIRouter(
     prefix="/subscriptions",
@@ -21,6 +32,9 @@ router_user_images = APIRouter(
     tags=["User media 🖼️"]
 )
 
+user_db_interface = UserDBInterface()
+user_interface = UserInterface()
+settings = get_settings()
 
 @router.post("/follow/{user_id}", summary="Подписаться/Отписаться от пользователя")
 async def toggle_follow_user(
@@ -30,10 +44,7 @@ async def toggle_follow_user(
 ):
     await session.refresh(current_user, attribute_names=["following"])
 
-    # TODO переименовать переменную
-    stmt = select(User).where(User.id == user_id)
-    result = await session.execute(stmt)
-    user_to_follow = result.scalars().first()
+    user_to_follow = await user_interface.fetch_one(session, user_id)
 
     if not user_to_follow:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
@@ -42,33 +53,31 @@ async def toggle_follow_user(
         current_user.following.remove(user_to_follow)
         await session.commit()
         return {"message": f"Вы успешно отписались от {user_to_follow.username}"}
-    # TODO убрать else
-    else:
-        current_user.following.append(user_to_follow)
-        await session.commit()
-        return {"message": f"Вы успешно подписались на {user_to_follow.username}"}
+    current_user.following.append(user_to_follow)
+    await session.commit()
+    return {"message": f"Вы успешно подписались на {user_to_follow.username}"}
 
 
 @router_user_images.post("/user/{user_id}/avatar/", summary="Установить пользователю аватар")
 async def upload_avatar(user_id: int, file: UploadFile = File(...)):
-    temp_path = f"{MEDIA_TEMP_AVATAR_URL}/{uuid.uuid4()}_{file.filename}"
+    temp_path = f"{settings.media_temp_avatar_dir}/{uuid.uuid4()}_{file.filename}"
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     celery_app.send_task(
         "celery_tasks.process_avatar.process_avatar",
-        args=[user_id, temp_path, MEDIA_AVATAR_URL]
+        args=[user_id, temp_path, settings.media_avatar_dir]
     )
     return {"status": "processing"}
 
 
 @router_user_images.post("/users/{user_id}/photos/", summary="Добавить фотаграфии", status_code=status.HTTP_201_CREATED)
 async def upload_photos(user_id: int, files: list[UploadFile] = File(...)):
-    os.makedirs(MEDIA_TEMP_USER_PHOTOS_URL, exist_ok=True)
+    os.makedirs(settings.media_temp_user_photos_dir, exist_ok=True)
 
     for file in files:
         tmp_name = f"{uuid.uuid4()}_{file.filename}"
-        tmp_path = os.path.join(MEDIA_TEMP_USER_PHOTOS_URL, tmp_name)
+        tmp_path = os.path.join(settings.media_temp_user_photos_dir, tmp_name)
 
         # Сохраняем во временное хранилище
         with open(tmp_path, "wb") as buf:
@@ -92,13 +101,8 @@ async def delete_photos(
     photo_id: int,
     session: AsyncSession = Depends(get_async_session)
 ):
-    result = await session.execute(
-        select(UserGallery).where(
-            UserGallery.id == photo_id,
-            UserGallery.user_id == user_id
-        )
-    )
-    photo = result.scalars().first()
+
+    photo = await user_db_interface.fetch_one(session, photo_id, user_id)
     if not photo:
         raise HTTPException(status_code=404, detail="Photo not found")
 
@@ -108,15 +112,14 @@ async def delete_photos(
     if photo.thumbnail_url:
         raw_paths.append(photo.thumbnail_url)
 
-    await session.execute(delete(UserGallery).where(UserGallery.id == photo_id))
-    await session.commit()
+    await user_db_interface.delete_one(session, photo_id)
 
     for p in raw_paths:
         if os.path.isabs(p):
             full_path = p
         else:
             rel = p.lstrip("/")
-            full_path = os.path.join(BASE_DIR, rel)
+            full_path = os.path.join(settings.base_dir, rel)
         celery_app.send_task(
             "celery_tasks.delete_media.delete_media",
             args=[full_path]

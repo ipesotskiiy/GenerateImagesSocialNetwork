@@ -4,17 +4,19 @@ from PIL import Image
 from celery import shared_task
 
 from comments.models import CommentImages
-from settings import MEDIA_COMMENT_IMAGES_URL, sync_session
+from settings import get_settings, get_sync_sessionmaker
 
+
+settings = get_settings()
 
 @shared_task(name="celery_tasks.upload_comment_image.upload_comment_image")
 def upload_comment_image(comment_id: int, temp_path: str):
-    os.makedirs(MEDIA_COMMENT_IMAGES_URL, exist_ok=True)
-    thumb_dir = os.path.join(MEDIA_COMMENT_IMAGES_URL, "thumbnails")
+    os.makedirs(settings.media_comment_images_dir, exist_ok=True)
+    thumb_dir = os.path.join(settings.media_comment_images_dir, "thumbnails")
     os.makedirs(thumb_dir, exist_ok=True)
 
     filename = os.path.basename(temp_path)
-    final_path = os.path.join(MEDIA_COMMENT_IMAGES_URL, filename)
+    final_path = os.path.join(settings.media_comment_images_dir, filename)
     thumbnail_path = os.path.join(thumb_dir, filename)
 
     with Image.open(temp_path) as img:
@@ -31,7 +33,7 @@ def upload_comment_image(comment_id: int, temp_path: str):
     except FileNotFoundError as e:
         print(f"Exception in upload comment image process: {e}")
 
-    db = sync_session()
+    db = get_sync_sessionmaker()
     try:
         comment_image = CommentImages(
             comment_id=comment_id,

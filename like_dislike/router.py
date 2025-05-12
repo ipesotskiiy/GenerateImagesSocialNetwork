@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from typing import Union
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.models import User
 from comments.models import Comment
 from like_dislike.models import Like, Dislike
-from like_dislike.schemas import LikeCreate, DislikeCreate
+from like_dislike.reaction_db_interface import ReactionDBInterface
+from like_dislike.schemas import LikeCreate, DislikeCreate, LikeResponse, DislikeResponse
 from posts.models import Post
 from settings import get_async_session
 from dependencies import current_user
@@ -20,8 +26,9 @@ dislike_router = APIRouter(
     tags=["Dislikes 💔"]
 )
 
-# TODO проаннотировать reaction_data
-async def toggle_reaction(reaction_data, session: AsyncSession = Depends(get_async_session)):
+reaction_db_interface = ReactionDBInterface()
+
+async def toggle_reaction(reaction_data: Union[LikeResponse, DislikeResponse], session: AsyncSession = Depends(get_async_session)):
     """
     Универсальная функция для установки/снятия лайка или дизлайка.
     - Если реакция уже стоит, то она снимается.
@@ -38,27 +45,9 @@ async def toggle_reaction(reaction_data, session: AsyncSession = Depends(get_asy
         OppositeModel = Like
         reaction_name = 'дизлайк'
 
-    # TODO переименовать result
+    existing_reaction = await reaction_db_interface.fetch_one(session, Model, reaction_data)
 
-    # Проверяем существует ли данная реакция
-    result = await session.execute(
-        select(Model).where(
-            Model.user_id == reaction_data.user_id,
-            Model.content_id == reaction_data.content_id,
-            Model.content_type == reaction_data.content_type
-        )
-    )
-    existing_reaction = result.scalars().first()
-
-    # Проверяем наличие противоположной реакции
-    result = await session.execute(
-        select(OppositeModel).where(
-            OppositeModel.user_id == reaction_data.user_id,
-            OppositeModel.content_id == reaction_data.content_id,
-            OppositeModel.content_type == reaction_data.content_type
-        )
-    )
-    existing_opposite = result.scalars().first()
+    existing_opposite = await reaction_db_interface.fetch_one(session, OppositeModel, reaction_data)
 
     if existing_reaction:
         # Если реакция уже стоит – снимаем её

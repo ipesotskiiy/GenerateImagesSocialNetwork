@@ -4,17 +4,18 @@ from PIL import Image
 from celery import shared_task
 
 from auth.models import UserGallery
-from settings import sync_session, MEDIA_USER_PHOTOS_URL
+from settings import get_settings, get_sync_engine
 
+settings = get_settings()
 
 @shared_task(name="celery_tasks.process_gallery.process_gallery")
 def process_gallery(user_id: int, temp_path: str):
-    os.makedirs(MEDIA_USER_PHOTOS_URL, exist_ok=True)
-    thumb_dir = os.path.join(MEDIA_USER_PHOTOS_URL, "thumbnails")
+    os.makedirs(settings.media_user_photos_dir, exist_ok=True)
+    thumb_dir = os.path.join(settings.media_user_photos_dir, "thumbnails")
     os.makedirs(thumb_dir, exist_ok=True)
 
     filename = os.path.basename(temp_path)
-    final_path = os.path.join(MEDIA_USER_PHOTOS_URL, filename)
+    final_path = os.path.join(settings.media_user_photos_dir, filename)
     thumbnail_path = os.path.join(thumb_dir, filename)
 
     with Image.open(temp_path) as img:
@@ -32,7 +33,7 @@ def process_gallery(user_id: int, temp_path: str):
     except FileNotFoundError as e:
         print(f"Exception in gallery process: {e}")
 
-    db = sync_session()
+    db = get_sync_engine()
     try:
         gallery_item = UserGallery(
             user_id=user_id,

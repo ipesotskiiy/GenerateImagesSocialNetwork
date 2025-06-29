@@ -1,0 +1,97 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: "appuser"
+      POSTGRES_PASSWORD: "secret"
+      POSTGRES_DB: "teamsocialdb"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appuser -d teamsocialdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: always
+
+  redis:
+    image: redis:7.4.4
+    restart: always
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bash -c "
+        for i in {1..30}; do
+          pg_isready -h db -U appuser -d teamsocialdb && break || sleep 10;
+        done;
+        alembic upgrade head
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: teamsocialdb
+      DB_USER: appuser
+      DB_PASSWORD: secret
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bash -c "
+        for i in {1..30}; do
+          pg_isready -h db -U appuser -d teamsocialdb && break || sleep 2;
+        done;
+        sleep 10;
+        uvicorn main:app --host 0.0.0.0 --port 3456
+      "
+    ports:
+      - "7000:3456"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: teamsocialdb
+      DB_USER: appuser
+      DB_PASSWORD: secret
+      REDIS_URL: redis://redis:6379/0
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      bash -c "
+        sleep 15 && celery -A celery_main.celery_app worker --loglevel=INFO
+      "
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      web:
+        condition: service_started
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: teamsocialdb
+      DB_USER: appuser
+      DB_PASSWORD: secret
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+    restart: always

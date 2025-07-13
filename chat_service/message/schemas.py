@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,6 +12,8 @@ class MessageBase(BaseModel):
 class MessageCreate(MessageBase):
     pass
 
+class MessageUpdate(BaseModel):
+    content: Optional[str] = None
 
 class MessageRead(MessageBase):
     id: int

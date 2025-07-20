@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from message.crud import create_message, update_message, delete_message, get_message
 from message.models import ChatMessage
 from message.schemas import MessageRead, MessageCreate, MessageUpdate
 from settings import get_session
@@ -12,43 +13,32 @@ router = APIRouter(
 
 )
 
-@router.post("/create/", response_model=MessageRead, summary="Создать сообщение", status_code=201)
-async def create_message(message: MessageCreate, session: AsyncSession = Depends(get_session)):
-    db_message = ChatMessage(**message.dict())
-    session.add(db_message)
-    await session.commit()
-    await session.refresh(db_message)
-    return db_message
+@router.post("/create/", response_model=MessageRead)
+async def create_message_http(
+    message: MessageCreate, session: AsyncSession = Depends(get_session)
+):
+    return await create_message(session, message.sender_id, message.recipient_id, message.content)
 
-@router.patch("/update/{message_id}", response_model=MessageRead, summary="Изменить сообщение")
-async def update_message(message_id: int, message: MessageUpdate, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(ChatMessage).where(ChatMessage.id==message_id))
-    db_message = result.scalar_one_or_none()
-    if not db_message:
+@router.patch("/update/{message_id}", response_model=MessageRead)
+async def update_message_http(
+    message_id: int, message: MessageUpdate, session: AsyncSession = Depends(get_session)
+):
+    updated = await update_message(session, message_id, message.content)
+    if updated is None:
         raise HTTPException(status_code=404, detail="Message not found")
-    if message.content is not None:
-        db_message.content = message.content
-    await session.commit()
-    await session.refresh(db_message)
-    return db_message
+    return updated
 
 @router.delete("/delete/{message_id}", status_code=204)
-async def delete_message(message_id: int, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(ChatMessage).where(ChatMessage.id==message_id))
-    db_message = result.scalar_one_or_none()
-    if not db_message:
+async def delete_message_http(
+    message_id: int, session: AsyncSession = Depends(get_session)
+):
+    success = await delete_message(session, message_id)
+    if not success:
         raise HTTPException(status_code=404, detail="Message not found")
-    await session.delete(db_message)
-    await session.commit()
-    return "Сообщение удалено"
 
 @router.get("/get/{message_id}", response_model=MessageRead)
-async def get_message(message_id: int, session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(ChatMessage).where(ChatMessage.id == message_id))
-    db_message = result.scalar_one_or_none()
-    if not db_message:
-        raise HTTPException(status_code=404, detail="Message not found")
-    return
+async def get_message_api(message_id: int, session: AsyncSession = Depends(get_session)):
+    return  await get_message(message_id, session)
 
 @router.get("/dialog/{user1_id}/{user2_id}/", response_model=list[MessageRead])
 async def get_dialog_messages(user1_id: int, user2_id: int, session: AsyncSession = Depends(get_session)):

@@ -1,3 +1,6 @@
 .env
 __pycache__/main.cpython-310.pyc
-../.idea/
+.idea/
+ __pycache__/
+ message/__pycache__
+ websocket/__pycache__/

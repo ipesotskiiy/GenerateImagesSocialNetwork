@@ -1,16 +1,17 @@
 from faststream.rabbit import RabbitBroker
-import asyncio
 
-broker = RabbitBroker("amqp://guest:guest@localhost/")
+AMQP_URL = "amqp://guest:guest@localhost/"
+broker = RabbitBroker(AMQP_URL)
 
-async def main():
-    await broker.connect()
-    await broker.publish(
-        {"sender_id": 123, "recipient_id": 555, "content": "Привет, RabbitMQ"},
-        "chat_messages"
-    )
-    print("Сообщение отправлено!")
-    await broker.close()
+async def publish_new(payload: dict):
+    print("[PUBLISH] new -> chat_messages:", payload)
+    await broker.publish(payload, "chat_messages")
 
-if __name__ == "__main__":
-    asyncio.run(main())
+async def publish_edit(payload: dict):
+    print("[PUBLISH] edit -> chat_messages:", payload)
+    await broker.publish(payload, "chat_messages")
+
+async def publish_delete(payload: dict):
+    print("[PUBLISH] delete -> chat_messages:", payload)
+    await broker.publish(payload, "chat_messages")
+

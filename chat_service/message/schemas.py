@@ -1,24 +1,30 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class MessageBase(BaseModel):
-    content: str
-    recipient_id: int
+    recipient_id: int = Field(..., ge=1)
+    content: str = Field(..., min_length=1, max_length=4000)
 
 
 class MessageCreate(MessageBase):
-    pass
+    """Тело запроса на создание сообщения."""
+    sender_id: int
+
 
 class MessageUpdate(BaseModel):
-    content: Optional[str] = None
+    """Тело запроса на частичное обновление сообщения."""
+    content: Optional[str] = Field(None, min_length=1, max_length=4000)
+
+    model_config = ConfigDict(extra="forbid")
+
 
 class MessageRead(MessageBase):
+    """Ответ со стороны API/БД."""
     id: int
     sender_id: int
     timestamp: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

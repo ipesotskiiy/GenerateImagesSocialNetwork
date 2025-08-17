@@ -1,6 +1,8 @@
 from faststream.rabbit import RabbitBroker
 
-broker = RabbitBroker("amqp://guest:guest@localhost/")
+from constants import AMQP_URL
+
+broker = RabbitBroker(AMQP_URL)
 
 
 async def start_consumer():

@@ -10,7 +10,6 @@ from fastapi import (
     File,
     status
 )
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.user_db_interface import UserDBInterface, UserInterface
@@ -71,7 +70,7 @@ async def upload_avatar(user_id: int, file: UploadFile = File(...)):
     return {"status": "processing"}
 
 
-@router_user_images.post("/users/{user_id}/photos/", summary="Добавить фотаграфии", status_code=status.HTTP_201_CREATED)
+@router_user_images.post("/users/{user_id}/photos/", summary="Добавить фотографии", status_code=status.HTTP_201_CREATED)
 async def upload_photos(user_id: int, files: list[UploadFile] = File(...)):
     os.makedirs(settings.media_temp_user_photos_dir, exist_ok=True)
 

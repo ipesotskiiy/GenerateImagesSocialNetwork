@@ -9,14 +9,14 @@ async def create_message(session: AsyncSession, sender_id: int, recipient_id: in
     await session.commit()
     await session.refresh(db_message)
 
-    await publish_new({
-        "type": "new",
+    payload = {
         "id": db_message.id,
         "sender_id": db_message.sender_id,
         "recipient_id": db_message.recipient_id,
         "content": db_message.content,
-        "timestamp": db_message.timestamp.isoformat(),
-    })
+        "timestamp": db_message.timestamp,
+    }
+    await publish_new(payload)
     return db_message
 
 async def update_message(session: AsyncSession, message_id: int, new_content: str) -> ChatMessage | None:
@@ -29,13 +29,14 @@ async def update_message(session: AsyncSession, message_id: int, new_content: st
     await session.commit()
     await session.refresh(db_message)
 
-    await publish_edit({
-        "type": "edit",
-        "message_id": db_message.id,
+    payload = {
+        "id": db_message.id,
         "sender_id": db_message.sender_id,
         "recipient_id": db_message.recipient_id,
-        "new_content": db_message.content,
-    })
+        "content": db_message.content,
+        "timestamp": db_message.timestamp,
+    }
+    await publish_edit(payload)
     return db_message
 
 async def delete_message(session: AsyncSession, message_id: int) -> bool:
@@ -44,16 +45,18 @@ async def delete_message(session: AsyncSession, message_id: int) -> bool:
     if not db_message:
         return False
 
-    sender_id, recipient_id = db_message.sender_id, db_message.recipient_id
     await session.delete(db_message)
     await session.commit()
 
-    await publish_delete({
-        "type": "delete",
-        "message_id": message_id,
-        "sender_id": sender_id,
-        "recipient_id": recipient_id,
-    })
+    payload = {
+        "id": db_message.id,
+        "sender_id": db_message.sender_id,
+        "recipient_id": db_message.recipient_id,
+        "content": None,
+        "timestamp": db_message.timestamp,
+    }
+    await publish_delete(payload)
+
     return True
 
 async def get_message(message_id: int, session: AsyncSession) -> ChatMessage | None:
